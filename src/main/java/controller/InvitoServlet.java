@@ -50,7 +50,11 @@ public class InvitoServlet extends HttpServlet {
                 accettaInvito(request, response, utente);
                 break;
             case "decline":
+            case "reject":
                 rifiutaInvito(request, response, utente);
+                break;
+            case "cancel":
+                eliminaInvito(request, response, utente);
                 break;
             default:
                 listaInviti(request, response, utente);
@@ -213,7 +217,7 @@ public class InvitoServlet extends HttpServlet {
                 return;
             }
 
-            boolean success = dao.updateStato(invitoId, "accepted");
+            boolean success = dao.updateStato(invitoId, "accettato");
 
             if (success) {
                 request.setAttribute("successo", "Invito accettato!");
@@ -258,7 +262,7 @@ public class InvitoServlet extends HttpServlet {
                 return;
             }
 
-            boolean success = dao.updateStato(invitoId, "declined");
+            boolean success = dao.updateStato(invitoId, "rifiutato");
 
             if (success) {
                 request.setAttribute("successo", "Invito rifiutato");

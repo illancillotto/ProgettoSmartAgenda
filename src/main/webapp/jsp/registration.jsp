@@ -214,10 +214,7 @@
                                 <span class="input-group-text">
                                     <i class="fas fa-user"></i>
                                 </span>
-                                <input type="text" class="form-control" name="username" id="username"
-                                    placeholder="Username (min 3 caratteri)" value="<%= request.getAttribute("
-                                    username") !=null ? request.getAttribute("username") : "" %>"
-                                required>
+                                <input type="text" name="username" value="<%= request.getAttribute("username") != null ? request.getAttribute("username") : "" %>" required/>                                
                             </div>
                             <div class="invalid-feedback"></div>
                         </div>

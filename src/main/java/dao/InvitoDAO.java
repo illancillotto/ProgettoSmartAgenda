@@ -23,12 +23,22 @@ public class InvitoDAO {
         }
     }
 
+    // Trova inviti ricevuti da un utente (metodo compatibile con JSP)
+    public List<Invito> findByDestinatario(int idUtente) {
+        return findInvitiRicevuti(idUtente);
+    }
+
+    // Trova inviti inviati da un utente (metodo compatibile con JSP)
+    public List<Invito> findByMittente(int idUtente) {
+        return findInvitiInviati(idUtente);
+    }
+
     // Trova inviti ricevuti da un utente
     public List<Invito> findInvitiRicevuti(int idUtente) {
         List<Invito> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
             String sql = "SELECT i.*, u1.username as username_invitante, u2.username as username_invitato, " +
-                    "a.titolo as titolo_appuntamento, a.data as data_appuntamento " +
+                    "a.titolo as titolo_appuntamento, a.data as data_appuntamento, a.descrizione " +
                     "FROM inviti i " +
                     "JOIN utenti u1 ON i.id_utente_invitante = u1.id " +
                     "JOIN utenti u2 ON i.id_utente_invitato = u2.id " +
@@ -51,6 +61,7 @@ public class InvitoDAO {
                 invito.setUsernameInvitato(rs.getString("username_invitato"));
                 invito.setTitoloAppuntamento(rs.getString("titolo_appuntamento"));
                 invito.setDataAppuntamento(rs.getTimestamp("data_appuntamento"));
+                invito.setDescrizione(rs.getString("descrizione"));
                 lista.add(invito);
             }
         } catch (Exception e) {
@@ -64,7 +75,7 @@ public class InvitoDAO {
         List<Invito> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
             String sql = "SELECT i.*, u1.username as username_invitante, u2.username as username_invitato, " +
-                    "a.titolo as titolo_appuntamento, a.data as data_appuntamento " +
+                    "a.titolo as titolo_appuntamento, a.data as data_appuntamento, a.descrizione " +
                     "FROM inviti i " +
                     "JOIN utenti u1 ON i.id_utente_invitante = u1.id " +
                     "JOIN utenti u2 ON i.id_utente_invitato = u2.id " +
@@ -87,6 +98,7 @@ public class InvitoDAO {
                 invito.setUsernameInvitato(rs.getString("username_invitato"));
                 invito.setTitoloAppuntamento(rs.getString("titolo_appuntamento"));
                 invito.setDataAppuntamento(rs.getTimestamp("data_appuntamento"));
+                invito.setDescrizione(rs.getString("descrizione"));
                 lista.add(invito);
             }
         } catch (Exception e) {
@@ -99,7 +111,7 @@ public class InvitoDAO {
     public Invito findById(int id) {
         try (Connection con = DBConnection.getConnection()) {
             String sql = "SELECT i.*, u1.username as username_invitante, u2.username as username_invitato, " +
-                    "a.titolo as titolo_appuntamento, a.data as data_appuntamento " +
+                    "a.titolo as titolo_appuntamento, a.data as data_appuntamento, a.descrizione " +
                     "FROM inviti i " +
                     "JOIN utenti u1 ON i.id_utente_invitante = u1.id " +
                     "JOIN utenti u2 ON i.id_utente_invitato = u2.id " +
@@ -122,6 +134,7 @@ public class InvitoDAO {
                 invito.setUsernameInvitato(rs.getString("username_invitato"));
                 invito.setTitoloAppuntamento(rs.getString("titolo_appuntamento"));
                 invito.setDataAppuntamento(rs.getTimestamp("data_appuntamento"));
+                invito.setDescrizione(rs.getString("descrizione"));
                 return invito;
             }
         } catch (Exception e) {

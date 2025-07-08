@@ -55,14 +55,17 @@
                                             </div>
                                             <% } else { %>
                                                 <% for (Invito invito : invitiRicevuti) { %>
-                                                    <div class="card mb-3 border-<%= invito.getStato().equals("
-                                                        accettato") ? "success" : (invito.getStato().equals("rifiutato")
-                                                        ? "danger" : "warning" ) %>">
+                                                    <div class="card mb-3 border-
+													  <%= invito.getStato().equals("accettato") ? "success"
+													      : invito.getStato().equals("rifiutato") ? "danger"
+													      : "warning"
+													  %>">
+
                                                         <div class="card-body">
                                                             <h6 class="card-title">
                                                                 <%= invito.getTitoloAppuntamento() %>
-                                                                    <span class="badge bg-<%= invito.getStato().equals("
-                                                                        accettato") ? "success" :
+                                                                    <span class="badge bg-
+                                                                    	<%= invito.getStato().equals("accettato") ? "success" :
                                                                         (invito.getStato().equals("rifiutato")
                                                                         ? "danger" : "warning" ) %>">
                                                                         <%= invito.getStato().toUpperCase() %>
@@ -73,8 +76,7 @@
                                                                 <%= invito.getUsernameMittente() %><br>
                                                                     <strong>Data:</strong>
                                                                     <%= invito.getDataAppuntamento() !=null ? new
-                                                                        java.text.SimpleDateFormat("dd/MM/yyyy
-                                                                        HH:mm").format(invito.getDataAppuntamento())
+                                                                        java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(invito.getDataAppuntamento())
                                                                         : "N/A" %><br>
                                                                         <% if (invito.getDescrizione() !=null &&
                                                                             !invito.getDescrizione().isEmpty()) { %>
@@ -122,14 +124,12 @@
                                             </div>
                                             <% } else { %>
                                                 <% for (Invito invito : invitiInviati) { %>
-                                                    <div class="card mb-3 border-<%= invito.getStato().equals("
-                                                        accettato") ? "success" : (invito.getStato().equals("rifiutato")
+                                                    <div class="card mb-3 border-<%= invito.getStato().equals("accettato") ? "success" : (invito.getStato().equals("rifiutato")
                                                         ? "danger" : "warning" ) %>">
                                                         <div class="card-body">
                                                             <h6 class="card-title">
                                                                 <%= invito.getTitoloAppuntamento() %>
-                                                                    <span class="badge bg-<%= invito.getStato().equals("
-                                                                        accettato") ? "success" :
+                                                                    <span class="badge bg-<%= invito.getStato().equals("accettato") ? "success" :
                                                                         (invito.getStato().equals("rifiutato")
                                                                         ? "danger" : "warning" ) %>">
                                                                         <%= invito.getStato().toUpperCase() %>
@@ -140,8 +140,7 @@
                                                                 <%= invito.getUsernameDestinatario() %><br>
                                                                     <strong>Data:</strong>
                                                                     <%= invito.getDataAppuntamento() !=null ? new
-                                                                        java.text.SimpleDateFormat("dd/MM/yyyy
-                                                                        HH:mm").format(invito.getDataAppuntamento())
+                                                                        java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(invito.getDataAppuntamento())
                                                                         : "N/A" %><br>
                                                                         <% if (invito.getDescrizione() !=null &&
                                                                             !invito.getDescrizione().isEmpty()) { %>

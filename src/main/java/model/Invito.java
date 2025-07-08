@@ -17,6 +17,7 @@ public class Invito {
     private String usernameInvitato;
     private String titoloAppuntamento;
     private Date dataAppuntamento;
+    private String descrizione; // Descrizione dell'appuntamento (join con tabella appuntamenti)
 
     public Invito() {
     }
@@ -26,7 +27,7 @@ public class Invito {
         this.idUtenteInvitante = idUtenteInvitante;
         this.idUtenteInvitato = idUtenteInvitato;
         this.messaggio = messaggio;
-        this.stato = "pending";
+        this.stato = "in_attesa";
         this.dataInvito = new Date();
     }
 
@@ -127,16 +128,33 @@ public class Invito {
         this.dataAppuntamento = dataAppuntamento;
     }
 
+    public String getDescrizione() {
+        return descrizione;
+    }
+
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
+    }
+
+    // Metodi di utilità per compatibilità con la JSP
+    public String getUsernameMittente() {
+        return usernameInvitante;
+    }
+
+    public String getUsernameDestinatario() {
+        return usernameInvitato;
+    }
+
     // Metodi di utilità
     public boolean isPending() {
-        return "pending".equals(stato);
+        return "in_attesa".equals(stato);
     }
 
     public boolean isAccepted() {
-        return "accepted".equals(stato);
+        return "accettato".equals(stato);
     }
 
     public boolean isDeclined() {
-        return "declined".equals(stato);
+        return "rifiutato".equals(stato);
     }
 }

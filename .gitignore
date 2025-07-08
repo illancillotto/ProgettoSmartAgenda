@@ -1,0 +1,37 @@
+# Build directory
+build/
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# JAR/WAR files
+*.jar
+*.war
+
+# IDE files
+.project
+.classpath
+.settings/
+.metadata/
+*.iml
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Database files (if any)
+*.db
+*.sqlite
+
+# Backup files
+*.bak
+*.orig 
