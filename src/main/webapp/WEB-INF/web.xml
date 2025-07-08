@@ -1,0 +1,121 @@
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+          http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>controller.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>RegistrationServlet</servlet-name>
+        <servlet-class>controller.RegistrationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RegistrationServlet</servlet-name>
+        <url-pattern>/register</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>AppuntamentoServlet</servlet-name>
+        <servlet-class>controller.AppuntamentoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AppuntamentoServlet</servlet-name>
+        <url-pattern>/agenda</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-class>controller.LogoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogoutServlet</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>InvitoServlet</servlet-name>
+        <servlet-class>controller.InvitoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>InvitoServlet</servlet-name>
+        <url-pattern>/inviti</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AdminServlet</servlet-name>
+        <servlet-class>controller.AdminServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminServlet</servlet-name>
+        <url-pattern>/admin</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>NotificaServlet</servlet-name>
+        <servlet-class>controller.NotificaServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NotificaServlet</servlet-name>
+        <url-pattern>/notifiche</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CategoriaServlet</servlet-name>
+        <servlet-class>controller.CategoriaServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CategoriaServlet</servlet-name>
+        <url-pattern>/categorie</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>jsp/login.jsp</welcome-file>
+    </welcome-file-list>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+            <secure>false</secure>
+        </cookie-config>
+    </session-config>
+
+    <filter>
+        <filter-name>AuthenticationFilter</filter-name>
+        <filter-class>filter.AuthenticationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthenticationFilter</filter-name>
+        <url-pattern>/jsp/home.jsp</url-pattern>
+        <url-pattern>/jsp/agenda.jsp</url-pattern>
+        <url-pattern>/jsp/admin.jsp</url-pattern>
+        <url-pattern>/jsp/inviti.jsp</url-pattern>
+        <url-pattern>/agenda</url-pattern>
+        <url-pattern>/admin</url-pattern>
+        <url-pattern>/inviti</url-pattern>
+        <url-pattern>/notifiche</url-pattern>
+        <url-pattern>/categorie</url-pattern>
+    </filter-mapping>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/jsp/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/jsp/error.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Exception</exception-type>
+        <location>/jsp/error.jsp</location>
+    </error-page>
+
+</web-app>

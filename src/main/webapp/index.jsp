@@ -1,0 +1,1 @@
+<% // Redirect automatico alla pagina di login response.sendRedirect(request.getContextPath() + "/jsp/login.jsp" ); %>
