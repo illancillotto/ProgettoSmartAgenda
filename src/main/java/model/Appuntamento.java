@@ -167,4 +167,19 @@ public class Appuntamento {
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM HH:mm");
         return sdf.format(dataOra);
     }
+
+    // Metodi per formattare la data per input HTML
+    public String getDataForHtmlInput() {
+        if (dataOra == null)
+            return "";
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(dataOra);
+    }
+
+    public String getOraForHtmlInput() {
+        if (dataOra == null)
+            return "";
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm");
+        return sdf.format(dataOra);
+    }
 }
