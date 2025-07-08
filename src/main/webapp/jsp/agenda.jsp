@@ -1,6 +1,8 @@
 <%@ page import="java.util.*, model.Appuntamento, model.Utente, model.Categoria" %>
     <% Utente utente=(Utente) session.getAttribute("utente"); if (utente==null) {
-        response.sendRedirect(request.getContextPath() + "/jsp/login.jsp" ); return; } // Usa gli attributi impostati dal servlet invece di fare query dirette 
+        response.sendRedirect(request.getContextPath() + "/jsp/login.jsp" ); return; } 
+    		
+    		// Usa gli attributi impostati dal servlet invece di fare query dirette 
     		
     		List<Appuntamento> lista = (List<Appuntamento>)
             request.getAttribute("appuntamenti");
@@ -111,7 +113,7 @@
                                                                                     <tbody>
                                                                                         <% for(Appuntamento a : lista) {
                                                                                             %>
-                                                                                            <tr class="<%= a.isPassato() ? "table-secondary" :(a.isOggi()? "table-warning" : "" )%>">
+                                                                                            <tr class="<%= a.isPassato() ? "table-secondary":(a.isOggi()? "table-warning": "" )%>">
                                                                                                 <td>
                                                                                                     <%= a.getDataFormatted()
                                                                                                         %>

@@ -22,6 +22,7 @@ public class AppuntamentoDAO {
                 app.setDataOra(rs.getTimestamp("DATA"));
                 app.setIdUtente(rs.getInt("ID_UTENTE"));
                 app.setCondiviso(rs.getBoolean("CONDIVISO"));
+                app.setIdCategoria(rs.getInt("ID_CATEGORIA"));
                 lista.add(app);
             }
         } catch (Exception e) {
@@ -33,13 +34,18 @@ public class AppuntamentoDAO {
     // Inserisci un nuovo appuntamento
     public boolean insert(Appuntamento app) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "INSERT INTO APPUNTAMENTI (TITOLO, DESCRIZIONE, DATA, ID_UTENTE, CONDIVISO) VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO APPUNTAMENTI (TITOLO, DESCRIZIONE, DATA, ID_UTENTE, CONDIVISO, ID_CATEGORIA) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, app.getTitolo());
             ps.setString(2, app.getDescrizione());
             ps.setTimestamp(3, new Timestamp(app.getDataOra().getTime()));
             ps.setInt(4, app.getIdUtente());
             ps.setBoolean(5, app.isCondiviso());
+            if (app.getIdCategoria() > 0) {
+                ps.setInt(6, app.getIdCategoria());
+            } else {
+                ps.setNull(6, java.sql.Types.INTEGER);
+            }
             int rows = ps.executeUpdate();
             return rows > 0;
         } catch (Exception e) {
@@ -63,6 +69,7 @@ public class AppuntamentoDAO {
                 app.setDataOra(rs.getTimestamp("DATA"));
                 app.setIdUtente(rs.getInt("ID_UTENTE"));
                 app.setCondiviso(rs.getBoolean("CONDIVISO"));
+                app.setIdCategoria(rs.getInt("ID_CATEGORIA"));
                 return app;
             }
         } catch (Exception e) {
@@ -74,13 +81,18 @@ public class AppuntamentoDAO {
     // Aggiorna un appuntamento
     public boolean update(Appuntamento app) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "UPDATE APPUNTAMENTI SET TITOLO=?, DESCRIZIONE=?, DATA=?, CONDIVISO=? WHERE ID=?";
+            String sql = "UPDATE APPUNTAMENTI SET TITOLO=?, DESCRIZIONE=?, DATA=?, CONDIVISO=?, ID_CATEGORIA=? WHERE ID=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, app.getTitolo());
             ps.setString(2, app.getDescrizione());
             ps.setTimestamp(3, new Timestamp(app.getDataOra().getTime()));
             ps.setBoolean(4, app.isCondiviso());
-            ps.setInt(5, app.getId());
+            if (app.getIdCategoria() > 0) {
+                ps.setInt(5, app.getIdCategoria());
+            } else {
+                ps.setNull(5, java.sql.Types.INTEGER);
+            }
+            ps.setInt(6, app.getId());
             int rows = ps.executeUpdate();
             return rows > 0;
         } catch (Exception e) {
@@ -121,6 +133,7 @@ public class AppuntamentoDAO {
                 app.setIdUtente(rs.getInt("ID_UTENTE"));
                 app.setUsername(rs.getString("USERNAME"));
                 app.setCondiviso(rs.getBoolean("CONDIVISO"));
+                app.setIdCategoria(rs.getInt("ID_CATEGORIA"));
                 lista.add(app);
             }
         } catch (Exception e) {
@@ -147,6 +160,7 @@ public class AppuntamentoDAO {
                 app.setDataOra(rs.getTimestamp("DATA"));
                 app.setIdUtente(rs.getInt("ID_UTENTE"));
                 app.setCondiviso(rs.getBoolean("CONDIVISO"));
+                app.setIdCategoria(rs.getInt("ID_CATEGORIA"));
                 lista.add(app);
             }
         } catch (Exception e) {
@@ -174,6 +188,7 @@ public class AppuntamentoDAO {
                 app.setDataOra(rs.getTimestamp("DATA"));
                 app.setIdUtente(rs.getInt("ID_UTENTE"));
                 app.setCondiviso(rs.getBoolean("CONDIVISO"));
+                app.setIdCategoria(rs.getInt("ID_CATEGORIA"));
                 lista.add(app);
             }
         } catch (Exception e) {
@@ -200,6 +215,7 @@ public class AppuntamentoDAO {
                 app.setIdUtente(rs.getInt("ID_UTENTE"));
                 app.setUsername(rs.getString("USERNAME"));
                 app.setCondiviso(rs.getBoolean("CONDIVISO"));
+                app.setIdCategoria(rs.getInt("ID_CATEGORIA"));
                 lista.add(app);
             }
         } catch (Exception e) {

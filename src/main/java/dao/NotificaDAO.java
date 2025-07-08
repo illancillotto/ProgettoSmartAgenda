@@ -197,4 +197,32 @@ public class NotificaDAO {
             e.printStackTrace();
         }
     }
+
+    // Crea notifica per invito ricevuto
+    public void createInvito(int idUtente, String usernameInvitante, String titoloAppuntamento) {
+        try {
+            Notifica notifica = new Notifica();
+            notifica.setIdUtente(idUtente);
+            notifica.setTitolo("Nuovo Invito");
+            notifica.setMessaggio("Hai ricevuto un invito da " + usernameInvitante +
+                    " per l'appuntamento '" + titoloAppuntamento + "'");
+            notifica.setTipo("info");
+            notifica.setLetta(false);
+
+            insert(notifica);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Invia notifica a tutti gli utenti (per AdminServlet)
+    public boolean sendToAll(String titolo, String messaggio, String tipo) {
+        try {
+            createGlobalNotification(titolo, messaggio, tipo);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -205,6 +205,11 @@ public class AppuntamentoServlet extends HttpServlet {
             String condivisoStr = request.getParameter("condiviso");
             String categoriaStr = request.getParameter("categoria");
 
+            // Debug logging
+            System.out.println("DEBUG UPDATE - ID: " + idStr);
+            System.out.println("DEBUG UPDATE - Titolo: " + titolo);
+            System.out.println("DEBUG UPDATE - Action: " + request.getParameter("action"));
+
             if (idStr == null || idStr.trim().isEmpty()) {
                 request.setAttribute("errore", "ID appuntamento non valido");
                 listaAppuntamenti(request, response, utente);
@@ -214,6 +219,13 @@ public class AppuntamentoServlet extends HttpServlet {
             int id = Integer.parseInt(idStr);
             AppuntamentoDAO dao = new AppuntamentoDAO();
             Appuntamento appuntamento = dao.findById(id);
+
+            System.out.println("DEBUG UPDATE - Appuntamento trovato: " + (appuntamento != null));
+            if (appuntamento != null) {
+                System.out.println("DEBUG UPDATE - ID originale: " + appuntamento.getId());
+                System.out.println("DEBUG UPDATE - Utente originale: " + appuntamento.getIdUtente());
+                System.out.println("DEBUG UPDATE - Utente corrente: " + utente.getId());
+            }
 
             if (appuntamento == null
                     || (appuntamento.getIdUtente() != utente.getId() && !utente.getRuolo().equals("admin"))) {
@@ -245,9 +257,20 @@ public class AppuntamentoServlet extends HttpServlet {
                 } catch (NumberFormatException e) {
                     appuntamento.setIdCategoria(0); // Rimuovi categoria
                 }
+            } else {
+                appuntamento.setIdCategoria(0); // Rimuovi categoria se non selezionata
             }
 
+            // NON modificare l'ID utente - l'appuntamento mantiene il proprietario
+            // originale
+            // appuntamento.setIdUtente() non deve essere chiamato qui
+
+            System.out.println("DEBUG UPDATE - Prima del save - ID: " + appuntamento.getId());
+            System.out.println("DEBUG UPDATE - Prima del save - Utente: " + appuntamento.getIdUtente());
+
             boolean success = dao.update(appuntamento);
+
+            System.out.println("DEBUG UPDATE - Risultato update: " + success);
 
             if (success) {
                 request.setAttribute("successo", "Appuntamento aggiornato con successo!");
