@@ -10,7 +10,10 @@ public class AppuntamentoDAO {
     public List<Appuntamento> findByUtente(int idUtente) {
         List<Appuntamento> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT * FROM APPUNTAMENTI WHERE ID_UTENTE=? ORDER BY DATA ASC";
+            String sql = "SELECT a.*, c.NOME as NOME_CATEGORIA, c.COLORE as COLORE_CATEGORIA " +
+                    "FROM APPUNTAMENTI a " +
+                    "LEFT JOIN CATEGORIE c ON a.ID_CATEGORIA = c.ID " +
+                    "WHERE a.ID_UTENTE=? ORDER BY a.DATA ASC";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idUtente);
             ResultSet rs = ps.executeQuery();
@@ -23,6 +26,8 @@ public class AppuntamentoDAO {
                 app.setIdUtente(rs.getInt("ID_UTENTE"));
                 app.setCondiviso(rs.getBoolean("CONDIVISO"));
                 app.setIdCategoria(rs.getInt("ID_CATEGORIA"));
+                app.setNomeCategoria(rs.getString("NOME_CATEGORIA"));
+                app.setColoreCategoria(rs.getString("COLORE_CATEGORIA"));
                 lista.add(app);
             }
         } catch (Exception e) {
@@ -80,7 +85,10 @@ public class AppuntamentoDAO {
     // Trova appuntamento per ID
     public Appuntamento findById(int id) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT * FROM APPUNTAMENTI WHERE ID=?";
+            String sql = "SELECT a.*, c.NOME as NOME_CATEGORIA, c.COLORE as COLORE_CATEGORIA " +
+                    "FROM APPUNTAMENTI a " +
+                    "LEFT JOIN CATEGORIE c ON a.ID_CATEGORIA = c.ID " +
+                    "WHERE a.ID=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -93,6 +101,8 @@ public class AppuntamentoDAO {
                 app.setIdUtente(rs.getInt("ID_UTENTE"));
                 app.setCondiviso(rs.getBoolean("CONDIVISO"));
                 app.setIdCategoria(rs.getInt("ID_CATEGORIA"));
+                app.setNomeCategoria(rs.getString("NOME_CATEGORIA"));
+                app.setColoreCategoria(rs.getString("COLORE_CATEGORIA"));
                 return app;
             }
         } catch (Exception e) {
@@ -142,8 +152,10 @@ public class AppuntamentoDAO {
     public List<Appuntamento> findCondivisi() {
         List<Appuntamento> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT a.*, u.USERNAME FROM APPUNTAMENTI a " +
+            String sql = "SELECT a.*, u.USERNAME, c.NOME as NOME_CATEGORIA, c.COLORE as COLORE_CATEGORIA " +
+                    "FROM APPUNTAMENTI a " +
                     "JOIN UTENTI u ON a.ID_UTENTE = u.ID " +
+                    "LEFT JOIN CATEGORIE c ON a.ID_CATEGORIA = c.ID " +
                     "WHERE a.CONDIVISO = true ORDER BY a.DATA ASC";
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -157,6 +169,8 @@ public class AppuntamentoDAO {
                 app.setUsername(rs.getString("USERNAME"));
                 app.setCondiviso(rs.getBoolean("CONDIVISO"));
                 app.setIdCategoria(rs.getInt("ID_CATEGORIA"));
+                app.setNomeCategoria(rs.getString("NOME_CATEGORIA"));
+                app.setColoreCategoria(rs.getString("COLORE_CATEGORIA"));
                 lista.add(app);
             }
         } catch (Exception e) {
@@ -196,8 +210,11 @@ public class AppuntamentoDAO {
     public List<Appuntamento> search(int idUtente, String termine) {
         List<Appuntamento> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT * FROM APPUNTAMENTI WHERE ID_UTENTE=? AND " +
-                    "(TITOLO LIKE ? OR DESCRIZIONE LIKE ?) ORDER BY DATA ASC";
+            String sql = "SELECT a.*, c.NOME as NOME_CATEGORIA, c.COLORE as COLORE_CATEGORIA " +
+                    "FROM APPUNTAMENTI a " +
+                    "LEFT JOIN CATEGORIE c ON a.ID_CATEGORIA = c.ID " +
+                    "WHERE a.ID_UTENTE=? AND (a.TITOLO LIKE ? OR a.DESCRIZIONE LIKE ?) " +
+                    "ORDER BY a.DATA ASC";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idUtente);
             ps.setString(2, "%" + termine + "%");
@@ -212,6 +229,8 @@ public class AppuntamentoDAO {
                 app.setIdUtente(rs.getInt("ID_UTENTE"));
                 app.setCondiviso(rs.getBoolean("CONDIVISO"));
                 app.setIdCategoria(rs.getInt("ID_CATEGORIA"));
+                app.setNomeCategoria(rs.getString("NOME_CATEGORIA"));
+                app.setColoreCategoria(rs.getString("COLORE_CATEGORIA"));
                 lista.add(app);
             }
         } catch (Exception e) {
@@ -224,8 +243,10 @@ public class AppuntamentoDAO {
     public List<Appuntamento> findAllForAdmin() {
         List<Appuntamento> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT a.*, u.USERNAME FROM APPUNTAMENTI a " +
+            String sql = "SELECT a.*, u.USERNAME, c.NOME as NOME_CATEGORIA, c.COLORE as COLORE_CATEGORIA " +
+                    "FROM APPUNTAMENTI a " +
                     "JOIN UTENTI u ON a.ID_UTENTE = u.ID " +
+                    "LEFT JOIN CATEGORIE c ON a.ID_CATEGORIA = c.ID " +
                     "ORDER BY a.DATA ASC";
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -239,6 +260,8 @@ public class AppuntamentoDAO {
                 app.setUsername(rs.getString("USERNAME"));
                 app.setCondiviso(rs.getBoolean("CONDIVISO"));
                 app.setIdCategoria(rs.getInt("ID_CATEGORIA"));
+                app.setNomeCategoria(rs.getString("NOME_CATEGORIA"));
+                app.setColoreCategoria(rs.getString("COLORE_CATEGORIA"));
                 lista.add(app);
             }
         } catch (Exception e) {
