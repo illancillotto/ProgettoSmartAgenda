@@ -9,7 +9,7 @@ public class InvitoDAO {
     // Inserisce un nuovo invito
     public boolean insert(Invito invito) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "INSERT INTO inviti (id_appuntamento, id_utente_invitante, id_utente_invitato, messaggio) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO INVITI (ID_APPUNTAMENTO, ID_UTENTE_INVITANTE, ID_UTENTE_INVITATO, MESSAGGIO) VALUES (?, ?, ?, ?)";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, invito.getIdAppuntamento());
             ps.setInt(2, invito.getIdUtenteInvitante());
@@ -37,31 +37,31 @@ public class InvitoDAO {
     public List<Invito> findInvitiRicevuti(int idUtente) {
         List<Invito> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT i.*, u1.username as username_invitante, u2.username as username_invitato, " +
-                    "a.titolo as titolo_appuntamento, a.data as data_appuntamento, a.descrizione " +
-                    "FROM inviti i " +
-                    "JOIN utenti u1 ON i.id_utente_invitante = u1.id " +
-                    "JOIN utenti u2 ON i.id_utente_invitato = u2.id " +
-                    "JOIN appuntamenti a ON i.id_appuntamento = a.id " +
-                    "WHERE i.id_utente_invitato = ? ORDER BY i.data_invito DESC";
+            String sql = "SELECT i.*, u1.USERNAME as username_invitante, u2.USERNAME as username_invitato, " +
+                    "a.TITOLO as titolo_appuntamento, a.DATA as data_appuntamento, a.DESCRIZIONE " +
+                    "FROM INVITI i " +
+                    "JOIN UTENTI u1 ON i.ID_UTENTE_INVITANTE = u1.ID " +
+                    "JOIN UTENTI u2 ON i.ID_UTENTE_INVITATO = u2.ID " +
+                    "JOIN APPUNTAMENTI a ON i.ID_APPUNTAMENTO = a.ID " +
+                    "WHERE i.ID_UTENTE_INVITATO = ? ORDER BY i.DATA_INVITO DESC";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idUtente);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Invito invito = new Invito();
-                invito.setId(rs.getInt("id"));
-                invito.setIdAppuntamento(rs.getInt("id_appuntamento"));
-                invito.setIdUtenteInvitante(rs.getInt("id_utente_invitante"));
-                invito.setIdUtenteInvitato(rs.getInt("id_utente_invitato"));
-                invito.setStato(rs.getString("stato"));
-                invito.setDataInvito(rs.getTimestamp("data_invito"));
-                invito.setDataRisposta(rs.getTimestamp("data_risposta"));
-                invito.setMessaggio(rs.getString("messaggio"));
+                invito.setId(rs.getInt("ID"));
+                invito.setIdAppuntamento(rs.getInt("ID_APPUNTAMENTO"));
+                invito.setIdUtenteInvitante(rs.getInt("ID_UTENTE_INVITANTE"));
+                invito.setIdUtenteInvitato(rs.getInt("ID_UTENTE_INVITATO"));
+                invito.setStato(rs.getString("STATO"));
+                invito.setDataInvito(rs.getTimestamp("DATA_INVITO"));
+                invito.setDataRisposta(rs.getTimestamp("DATA_RISPOSTA"));
+                invito.setMessaggio(rs.getString("MESSAGGIO"));
                 invito.setUsernameInvitante(rs.getString("username_invitante"));
                 invito.setUsernameInvitato(rs.getString("username_invitato"));
                 invito.setTitoloAppuntamento(rs.getString("titolo_appuntamento"));
                 invito.setDataAppuntamento(rs.getTimestamp("data_appuntamento"));
-                invito.setDescrizione(rs.getString("descrizione"));
+                invito.setDescrizione(rs.getString("DESCRIZIONE"));
                 lista.add(invito);
             }
         } catch (Exception e) {
@@ -74,31 +74,31 @@ public class InvitoDAO {
     public List<Invito> findInvitiInviati(int idUtente) {
         List<Invito> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT i.*, u1.username as username_invitante, u2.username as username_invitato, " +
-                    "a.titolo as titolo_appuntamento, a.data as data_appuntamento, a.descrizione " +
-                    "FROM inviti i " +
-                    "JOIN utenti u1 ON i.id_utente_invitante = u1.id " +
-                    "JOIN utenti u2 ON i.id_utente_invitato = u2.id " +
-                    "JOIN appuntamenti a ON i.id_appuntamento = a.id " +
-                    "WHERE i.id_utente_invitante = ? ORDER BY i.data_invito DESC";
+            String sql = "SELECT i.*, u1.USERNAME as username_invitante, u2.USERNAME as username_invitato, " +
+                    "a.TITOLO as titolo_appuntamento, a.DATA as data_appuntamento, a.DESCRIZIONE " +
+                    "FROM INVITI i " +
+                    "JOIN UTENTI u1 ON i.ID_UTENTE_INVITANTE = u1.ID " +
+                    "JOIN UTENTI u2 ON i.ID_UTENTE_INVITATO = u2.ID " +
+                    "JOIN APPUNTAMENTI a ON i.ID_APPUNTAMENTO = a.ID " +
+                    "WHERE i.ID_UTENTE_INVITANTE = ? ORDER BY i.DATA_INVITO DESC";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idUtente);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Invito invito = new Invito();
-                invito.setId(rs.getInt("id"));
-                invito.setIdAppuntamento(rs.getInt("id_appuntamento"));
-                invito.setIdUtenteInvitante(rs.getInt("id_utente_invitante"));
-                invito.setIdUtenteInvitato(rs.getInt("id_utente_invitato"));
-                invito.setStato(rs.getString("stato"));
-                invito.setDataInvito(rs.getTimestamp("data_invito"));
-                invito.setDataRisposta(rs.getTimestamp("data_risposta"));
-                invito.setMessaggio(rs.getString("messaggio"));
+                invito.setId(rs.getInt("ID"));
+                invito.setIdAppuntamento(rs.getInt("ID_APPUNTAMENTO"));
+                invito.setIdUtenteInvitante(rs.getInt("ID_UTENTE_INVITANTE"));
+                invito.setIdUtenteInvitato(rs.getInt("ID_UTENTE_INVITATO"));
+                invito.setStato(rs.getString("STATO"));
+                invito.setDataInvito(rs.getTimestamp("DATA_INVITO"));
+                invito.setDataRisposta(rs.getTimestamp("DATA_RISPOSTA"));
+                invito.setMessaggio(rs.getString("MESSAGGIO"));
                 invito.setUsernameInvitante(rs.getString("username_invitante"));
                 invito.setUsernameInvitato(rs.getString("username_invitato"));
                 invito.setTitoloAppuntamento(rs.getString("titolo_appuntamento"));
                 invito.setDataAppuntamento(rs.getTimestamp("data_appuntamento"));
-                invito.setDescrizione(rs.getString("descrizione"));
+                invito.setDescrizione(rs.getString("DESCRIZIONE"));
                 lista.add(invito);
             }
         } catch (Exception e) {
@@ -110,31 +110,31 @@ public class InvitoDAO {
     // Trova invito per ID
     public Invito findById(int id) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT i.*, u1.username as username_invitante, u2.username as username_invitato, " +
-                    "a.titolo as titolo_appuntamento, a.data as data_appuntamento, a.descrizione " +
-                    "FROM inviti i " +
-                    "JOIN utenti u1 ON i.id_utente_invitante = u1.id " +
-                    "JOIN utenti u2 ON i.id_utente_invitato = u2.id " +
-                    "JOIN appuntamenti a ON i.id_appuntamento = a.id " +
-                    "WHERE i.id = ?";
+            String sql = "SELECT i.*, u1.USERNAME as username_invitante, u2.USERNAME as username_invitato, " +
+                    "a.TITOLO as titolo_appuntamento, a.DATA as data_appuntamento, a.DESCRIZIONE " +
+                    "FROM INVITI i " +
+                    "JOIN UTENTI u1 ON i.ID_UTENTE_INVITANTE = u1.ID " +
+                    "JOIN UTENTI u2 ON i.ID_UTENTE_INVITATO = u2.ID " +
+                    "JOIN APPUNTAMENTI a ON i.ID_APPUNTAMENTO = a.ID " +
+                    "WHERE i.ID = ?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 Invito invito = new Invito();
-                invito.setId(rs.getInt("id"));
-                invito.setIdAppuntamento(rs.getInt("id_appuntamento"));
-                invito.setIdUtenteInvitante(rs.getInt("id_utente_invitante"));
-                invito.setIdUtenteInvitato(rs.getInt("id_utente_invitato"));
-                invito.setStato(rs.getString("stato"));
-                invito.setDataInvito(rs.getTimestamp("data_invito"));
-                invito.setDataRisposta(rs.getTimestamp("data_risposta"));
-                invito.setMessaggio(rs.getString("messaggio"));
+                invito.setId(rs.getInt("ID"));
+                invito.setIdAppuntamento(rs.getInt("ID_APPUNTAMENTO"));
+                invito.setIdUtenteInvitante(rs.getInt("ID_UTENTE_INVITANTE"));
+                invito.setIdUtenteInvitato(rs.getInt("ID_UTENTE_INVITATO"));
+                invito.setStato(rs.getString("STATO"));
+                invito.setDataInvito(rs.getTimestamp("DATA_INVITO"));
+                invito.setDataRisposta(rs.getTimestamp("DATA_RISPOSTA"));
+                invito.setMessaggio(rs.getString("MESSAGGIO"));
                 invito.setUsernameInvitante(rs.getString("username_invitante"));
                 invito.setUsernameInvitato(rs.getString("username_invitato"));
                 invito.setTitoloAppuntamento(rs.getString("titolo_appuntamento"));
                 invito.setDataAppuntamento(rs.getTimestamp("data_appuntamento"));
-                invito.setDescrizione(rs.getString("descrizione"));
+                invito.setDescrizione(rs.getString("DESCRIZIONE"));
                 return invito;
             }
         } catch (Exception e) {
@@ -146,7 +146,7 @@ public class InvitoDAO {
     // Aggiorna lo stato di un invito
     public boolean updateStato(int id, String stato) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "UPDATE inviti SET stato = ?, data_risposta = CURRENT_TIMESTAMP WHERE id = ?";
+            String sql = "UPDATE INVITI SET STATO = ?, DATA_RISPOSTA = CURRENT_TIMESTAMP WHERE ID = ?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, stato);
             ps.setInt(2, id);
@@ -161,7 +161,7 @@ public class InvitoDAO {
     // Elimina un invito
     public boolean delete(int id) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "DELETE FROM inviti WHERE id = ?";
+            String sql = "DELETE FROM INVITI WHERE ID = ?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, id);
             int rows = ps.executeUpdate();
@@ -175,7 +175,7 @@ public class InvitoDAO {
     // Verifica se esiste già un invito per un appuntamento e utente
     public boolean existsInvito(int idAppuntamento, int idUtenteInvitato) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT COUNT(*) FROM inviti WHERE id_appuntamento = ? AND id_utente_invitato = ?";
+            String sql = "SELECT COUNT(*) FROM INVITI WHERE ID_APPUNTAMENTO = ? AND ID_UTENTE_INVITATO = ?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idAppuntamento);
             ps.setInt(2, idUtenteInvitato);
@@ -193,24 +193,24 @@ public class InvitoDAO {
     public List<Invito> findByAppuntamento(int idAppuntamento) {
         List<Invito> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT i.*, u1.username as username_invitante, u2.username as username_invitato " +
-                    "FROM inviti i " +
-                    "JOIN utenti u1 ON i.id_utente_invitante = u1.id " +
-                    "JOIN utenti u2 ON i.id_utente_invitato = u2.id " +
-                    "WHERE i.id_appuntamento = ? ORDER BY i.data_invito DESC";
+            String sql = "SELECT i.*, u1.USERNAME as username_invitante, u2.USERNAME as username_invitato " +
+                    "FROM INVITI i " +
+                    "JOIN UTENTI u1 ON i.ID_UTENTE_INVITANTE = u1.ID " +
+                    "JOIN UTENTI u2 ON i.ID_UTENTE_INVITATO = u2.ID " +
+                    "WHERE i.ID_APPUNTAMENTO = ? ORDER BY i.DATA_INVITO DESC";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idAppuntamento);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Invito invito = new Invito();
-                invito.setId(rs.getInt("id"));
-                invito.setIdAppuntamento(rs.getInt("id_appuntamento"));
-                invito.setIdUtenteInvitante(rs.getInt("id_utente_invitante"));
-                invito.setIdUtenteInvitato(rs.getInt("id_utente_invitato"));
-                invito.setStato(rs.getString("stato"));
-                invito.setDataInvito(rs.getTimestamp("data_invito"));
-                invito.setDataRisposta(rs.getTimestamp("data_risposta"));
-                invito.setMessaggio(rs.getString("messaggio"));
+                invito.setId(rs.getInt("ID"));
+                invito.setIdAppuntamento(rs.getInt("ID_APPUNTAMENTO"));
+                invito.setIdUtenteInvitante(rs.getInt("ID_UTENTE_INVITANTE"));
+                invito.setIdUtenteInvitato(rs.getInt("ID_UTENTE_INVITATO"));
+                invito.setStato(rs.getString("STATO"));
+                invito.setDataInvito(rs.getTimestamp("DATA_INVITO"));
+                invito.setDataRisposta(rs.getTimestamp("DATA_RISPOSTA"));
+                invito.setMessaggio(rs.getString("MESSAGGIO"));
                 invito.setUsernameInvitante(rs.getString("username_invitante"));
                 invito.setUsernameInvitato(rs.getString("username_invitato"));
                 lista.add(invito);

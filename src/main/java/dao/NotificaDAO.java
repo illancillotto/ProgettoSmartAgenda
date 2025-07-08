@@ -6,10 +6,10 @@ import java.util.*;
 
 public class NotificaDAO {
 
-    // Inserisce una nuova notifica
+    // Inserisci una nuova notifica
     public boolean insert(Notifica notifica) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "INSERT INTO notifiche (id_utente, titolo, messaggio, tipo, data_scadenza) VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO NOTIFICHE (ID_UTENTE, TITOLO, MESSAGGIO, TIPO, DATA_SCADENZA) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, notifica.getIdUtente());
             ps.setString(2, notifica.getTitolo());
@@ -28,24 +28,24 @@ public class NotificaDAO {
         }
     }
 
-    // Trova notifiche per un utente
+    // Trova tutte le notifiche attive di un utente
     public List<Notifica> findByUtente(int idUtente) {
         List<Notifica> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT * FROM notifiche WHERE id_utente = ? AND (data_scadenza IS NULL OR data_scadenza > NOW()) ORDER BY data_creazione DESC";
+            String sql = "SELECT * FROM NOTIFICHE WHERE ID_UTENTE = ? AND (DATA_SCADENZA IS NULL OR DATA_SCADENZA > NOW()) ORDER BY DATA_CREAZIONE DESC";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idUtente);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Notifica notifica = new Notifica();
-                notifica.setId(rs.getInt("id"));
-                notifica.setIdUtente(rs.getInt("id_utente"));
-                notifica.setTitolo(rs.getString("titolo"));
-                notifica.setMessaggio(rs.getString("messaggio"));
-                notifica.setTipo(rs.getString("tipo"));
-                notifica.setLetta(rs.getBoolean("letta"));
-                notifica.setDataCreazione(rs.getTimestamp("data_creazione"));
-                notifica.setDataScadenza(rs.getTimestamp("data_scadenza"));
+                notifica.setId(rs.getInt("ID"));
+                notifica.setIdUtente(rs.getInt("ID_UTENTE"));
+                notifica.setTitolo(rs.getString("TITOLO"));
+                notifica.setMessaggio(rs.getString("MESSAGGIO"));
+                notifica.setTipo(rs.getString("TIPO"));
+                notifica.setLetta(rs.getBoolean("LETTA"));
+                notifica.setDataCreazione(rs.getTimestamp("DATA_CREAZIONE"));
+                notifica.setDataScadenza(rs.getTimestamp("DATA_SCADENZA"));
                 lista.add(notifica);
             }
         } catch (Exception e) {
@@ -54,24 +54,24 @@ public class NotificaDAO {
         return lista;
     }
 
-    // Trova notifiche non lette per un utente
+    // Trova notifiche non lette di un utente
     public List<Notifica> findNonLette(int idUtente) {
         List<Notifica> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT * FROM notifiche WHERE id_utente = ? AND letta = false AND (data_scadenza IS NULL OR data_scadenza > NOW()) ORDER BY data_creazione DESC";
+            String sql = "SELECT * FROM NOTIFICHE WHERE ID_UTENTE = ? AND LETTA = false AND (DATA_SCADENZA IS NULL OR DATA_SCADENZA > NOW()) ORDER BY DATA_CREAZIONE DESC";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idUtente);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Notifica notifica = new Notifica();
-                notifica.setId(rs.getInt("id"));
-                notifica.setIdUtente(rs.getInt("id_utente"));
-                notifica.setTitolo(rs.getString("titolo"));
-                notifica.setMessaggio(rs.getString("messaggio"));
-                notifica.setTipo(rs.getString("tipo"));
-                notifica.setLetta(rs.getBoolean("letta"));
-                notifica.setDataCreazione(rs.getTimestamp("data_creazione"));
-                notifica.setDataScadenza(rs.getTimestamp("data_scadenza"));
+                notifica.setId(rs.getInt("ID"));
+                notifica.setIdUtente(rs.getInt("ID_UTENTE"));
+                notifica.setTitolo(rs.getString("TITOLO"));
+                notifica.setMessaggio(rs.getString("MESSAGGIO"));
+                notifica.setTipo(rs.getString("TIPO"));
+                notifica.setLetta(rs.getBoolean("LETTA"));
+                notifica.setDataCreazione(rs.getTimestamp("DATA_CREAZIONE"));
+                notifica.setDataScadenza(rs.getTimestamp("DATA_SCADENZA"));
                 lista.add(notifica);
             }
         } catch (Exception e) {
@@ -83,7 +83,7 @@ public class NotificaDAO {
     // Conta notifiche non lette
     public int countNonLette(int idUtente) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT COUNT(*) FROM notifiche WHERE id_utente = ? AND letta = false AND (data_scadenza IS NULL OR data_scadenza > NOW())";
+            String sql = "SELECT COUNT(*) FROM NOTIFICHE WHERE ID_UTENTE = ? AND LETTA = false AND (DATA_SCADENZA IS NULL OR DATA_SCADENZA > NOW())";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idUtente);
             ResultSet rs = ps.executeQuery();
@@ -96,10 +96,10 @@ public class NotificaDAO {
         return 0;
     }
 
-    // Marca una notifica come letta
+    // Segna una notifica come letta
     public boolean markAsRead(int id) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "UPDATE notifiche SET letta = true WHERE id = ?";
+            String sql = "UPDATE NOTIFICHE SET LETTA = true WHERE ID = ?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, id);
             int rows = ps.executeUpdate();
@@ -110,10 +110,10 @@ public class NotificaDAO {
         }
     }
 
-    // Marca tutte le notifiche di un utente come lette
+    // Segna tutte le notifiche come lette per un utente
     public boolean markAllAsRead(int idUtente) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "UPDATE notifiche SET letta = true WHERE id_utente = ?";
+            String sql = "UPDATE NOTIFICHE SET LETTA = true WHERE ID_UTENTE = ?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idUtente);
             int rows = ps.executeUpdate();
@@ -127,7 +127,7 @@ public class NotificaDAO {
     // Elimina una notifica
     public boolean delete(int id) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "DELETE FROM notifiche WHERE id = ?";
+            String sql = "DELETE FROM NOTIFICHE WHERE ID = ?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, id);
             int rows = ps.executeUpdate();
@@ -138,61 +138,46 @@ public class NotificaDAO {
         }
     }
 
-    // Elimina notifiche scadute
-    public boolean deleteScadute() {
+    // Pulisce notifiche scadute
+    public void cleanExpiredNotifications() {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "DELETE FROM notifiche WHERE data_scadenza IS NOT NULL AND data_scadenza < NOW()";
+            String sql = "DELETE FROM NOTIFICHE WHERE DATA_SCADENZA IS NOT NULL AND DATA_SCADENZA < NOW()";
             PreparedStatement ps = con.prepareStatement(sql);
-            int rows = ps.executeUpdate();
-            return rows > 0;
+            ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
     }
 
     // Crea notifica di benvenuto per nuovo utente
-    public boolean createBenvenuto(int idUtente, String username) {
-        Notifica notifica = new Notifica(idUtente,
-                "Benvenuto in SmartAgenda!",
-                "Ciao " + username + "! Benvenuto in SmartAgenda. Puoi iniziare creando il tuo primo appuntamento.",
-                "success");
-        return insert(notifica);
-    }
-
-    // Crea notifica per nuovo invito
-    public boolean createInvito(int idUtente, String usernameInvitante, String titoloAppuntamento) {
-        Notifica notifica = new Notifica(idUtente,
-                "Nuovo invito ricevuto",
-                usernameInvitante + " ti ha invitato all'appuntamento: " + titoloAppuntamento,
-                "info");
-        return insert(notifica);
-    }
-
-    // Crea notifica per promemoria appuntamento
-    public boolean createPromemoria(int idUtente, String titoloAppuntamento, java.util.Date dataAppuntamento) {
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
-        Notifica notifica = new Notifica(idUtente,
-                "Promemoria appuntamento",
-                "Il tuo appuntamento '" + titoloAppuntamento + "' è programmato per " + sdf.format(dataAppuntamento),
-                "warning");
-        return insert(notifica);
-    }
-
-    // Invia notifica a tutti gli utenti (solo admin)
-    public boolean sendToAll(String titolo, String messaggio, String tipo) {
+    public void createBenvenuto(int idUtente, String username) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "INSERT INTO notifiche (id_utente, titolo, messaggio, tipo) " +
-                    "SELECT id, ?, ?, ? FROM utenti WHERE attivo = true";
+            Notifica notifica = new Notifica();
+            notifica.setIdUtente(idUtente);
+            notifica.setTitolo("Benvenuto in SmartAgenda!");
+            notifica.setMessaggio("Ciao " + username + ", benvenuto nella tua agenda intelligente. " +
+                    "Inizia creando il tuo primo appuntamento!");
+            notifica.setTipo("info");
+            notifica.setLetta(false);
+
+            insert(notifica);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Crea notifica per tutti gli utenti attivi (admin)
+    public void createGlobalNotification(String titolo, String messaggio, String tipo) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "INSERT INTO NOTIFICHE (ID_UTENTE, TITOLO, MESSAGGIO, TIPO) " +
+                    "SELECT ID, ?, ?, ? FROM UTENTI WHERE ATTIVO = true";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, titolo);
             ps.setString(2, messaggio);
             ps.setString(3, tipo);
-            int rows = ps.executeUpdate();
-            return rows > 0;
+            ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
     }
 }

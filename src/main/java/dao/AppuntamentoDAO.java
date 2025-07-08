@@ -10,18 +10,18 @@ public class AppuntamentoDAO {
     public List<Appuntamento> findByUtente(int idUtente) {
         List<Appuntamento> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT * FROM appuntamenti WHERE id_utente=? ORDER BY data ASC";
+            String sql = "SELECT * FROM APPUNTAMENTI WHERE ID_UTENTE=? ORDER BY DATA ASC";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idUtente);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Appuntamento app = new Appuntamento();
-                app.setId(rs.getInt("id"));
-                app.setTitolo(rs.getString("titolo"));
-                app.setDescrizione(rs.getString("descrizione"));
-                app.setDataOra(rs.getTimestamp("data"));
-                app.setIdUtente(rs.getInt("id_utente"));
-                app.setCondiviso(rs.getBoolean("condiviso"));
+                app.setId(rs.getInt("ID"));
+                app.setTitolo(rs.getString("TITOLO"));
+                app.setDescrizione(rs.getString("DESCRIZIONE"));
+                app.setDataOra(rs.getTimestamp("DATA"));
+                app.setIdUtente(rs.getInt("ID_UTENTE"));
+                app.setCondiviso(rs.getBoolean("CONDIVISO"));
                 lista.add(app);
             }
         } catch (Exception e) {
@@ -33,7 +33,7 @@ public class AppuntamentoDAO {
     // Inserisci un nuovo appuntamento
     public boolean insert(Appuntamento app) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "INSERT INTO appuntamenti (titolo, descrizione, data, id_utente, condiviso) VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO APPUNTAMENTI (TITOLO, DESCRIZIONE, DATA, ID_UTENTE, CONDIVISO) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, app.getTitolo());
             ps.setString(2, app.getDescrizione());
@@ -51,18 +51,18 @@ public class AppuntamentoDAO {
     // Trova appuntamento per ID
     public Appuntamento findById(int id) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT * FROM appuntamenti WHERE id=?";
+            String sql = "SELECT * FROM APPUNTAMENTI WHERE ID=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 Appuntamento app = new Appuntamento();
-                app.setId(rs.getInt("id"));
-                app.setTitolo(rs.getString("titolo"));
-                app.setDescrizione(rs.getString("descrizione"));
-                app.setDataOra(rs.getTimestamp("data"));
-                app.setIdUtente(rs.getInt("id_utente"));
-                app.setCondiviso(rs.getBoolean("condiviso"));
+                app.setId(rs.getInt("ID"));
+                app.setTitolo(rs.getString("TITOLO"));
+                app.setDescrizione(rs.getString("DESCRIZIONE"));
+                app.setDataOra(rs.getTimestamp("DATA"));
+                app.setIdUtente(rs.getInt("ID_UTENTE"));
+                app.setCondiviso(rs.getBoolean("CONDIVISO"));
                 return app;
             }
         } catch (Exception e) {
@@ -74,7 +74,7 @@ public class AppuntamentoDAO {
     // Aggiorna un appuntamento
     public boolean update(Appuntamento app) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "UPDATE appuntamenti SET titolo=?, descrizione=?, data=?, condiviso=? WHERE id=?";
+            String sql = "UPDATE APPUNTAMENTI SET TITOLO=?, DESCRIZIONE=?, DATA=?, CONDIVISO=? WHERE ID=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, app.getTitolo());
             ps.setString(2, app.getDescrizione());
@@ -92,7 +92,7 @@ public class AppuntamentoDAO {
     // Elimina un appuntamento
     public boolean delete(int id) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "DELETE FROM appuntamenti WHERE id=?";
+            String sql = "DELETE FROM APPUNTAMENTI WHERE ID=?";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, id);
             int rows = ps.executeUpdate();
@@ -107,20 +107,20 @@ public class AppuntamentoDAO {
     public List<Appuntamento> findCondivisi() {
         List<Appuntamento> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT a.*, u.username FROM appuntamenti a " +
-                    "JOIN utenti u ON a.id_utente = u.id " +
-                    "WHERE a.condiviso = true ORDER BY a.data ASC";
+            String sql = "SELECT a.*, u.USERNAME FROM APPUNTAMENTI a " +
+                    "JOIN UTENTI u ON a.ID_UTENTE = u.ID " +
+                    "WHERE a.CONDIVISO = true ORDER BY a.DATA ASC";
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Appuntamento app = new Appuntamento();
-                app.setId(rs.getInt("id"));
-                app.setTitolo(rs.getString("titolo"));
-                app.setDescrizione(rs.getString("descrizione"));
-                app.setDataOra(rs.getTimestamp("data"));
-                app.setIdUtente(rs.getInt("id_utente"));
-                app.setUsername(rs.getString("username"));
-                app.setCondiviso(rs.getBoolean("condiviso"));
+                app.setId(rs.getInt("ID"));
+                app.setTitolo(rs.getString("TITOLO"));
+                app.setDescrizione(rs.getString("DESCRIZIONE"));
+                app.setDataOra(rs.getTimestamp("DATA"));
+                app.setIdUtente(rs.getInt("ID_UTENTE"));
+                app.setUsername(rs.getString("USERNAME"));
+                app.setCondiviso(rs.getBoolean("CONDIVISO"));
                 lista.add(app);
             }
         } catch (Exception e) {
@@ -133,7 +133,7 @@ public class AppuntamentoDAO {
     public List<Appuntamento> findByDateRange(int idUtente, java.util.Date dataInizio, java.util.Date dataFine) {
         List<Appuntamento> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT * FROM appuntamenti WHERE id_utente=? AND data BETWEEN ? AND ? ORDER BY data ASC";
+            String sql = "SELECT * FROM APPUNTAMENTI WHERE ID_UTENTE=? AND DATA BETWEEN ? AND ? ORDER BY DATA ASC";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idUtente);
             ps.setTimestamp(2, new Timestamp(dataInizio.getTime()));
@@ -141,12 +141,12 @@ public class AppuntamentoDAO {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Appuntamento app = new Appuntamento();
-                app.setId(rs.getInt("id"));
-                app.setTitolo(rs.getString("titolo"));
-                app.setDescrizione(rs.getString("descrizione"));
-                app.setDataOra(rs.getTimestamp("data"));
-                app.setIdUtente(rs.getInt("id_utente"));
-                app.setCondiviso(rs.getBoolean("condiviso"));
+                app.setId(rs.getInt("ID"));
+                app.setTitolo(rs.getString("TITOLO"));
+                app.setDescrizione(rs.getString("DESCRIZIONE"));
+                app.setDataOra(rs.getTimestamp("DATA"));
+                app.setIdUtente(rs.getInt("ID_UTENTE"));
+                app.setCondiviso(rs.getBoolean("CONDIVISO"));
                 lista.add(app);
             }
         } catch (Exception e) {
@@ -159,8 +159,8 @@ public class AppuntamentoDAO {
     public List<Appuntamento> search(int idUtente, String termine) {
         List<Appuntamento> lista = new ArrayList<>();
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT * FROM appuntamenti WHERE id_utente=? AND " +
-                    "(titolo LIKE ? OR descrizione LIKE ?) ORDER BY data ASC";
+            String sql = "SELECT * FROM APPUNTAMENTI WHERE ID_UTENTE=? AND " +
+                    "(TITOLO LIKE ? OR DESCRIZIONE LIKE ?) ORDER BY DATA ASC";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, idUtente);
             ps.setString(2, "%" + termine + "%");
@@ -168,12 +168,12 @@ public class AppuntamentoDAO {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Appuntamento app = new Appuntamento();
-                app.setId(rs.getInt("id"));
-                app.setTitolo(rs.getString("titolo"));
-                app.setDescrizione(rs.getString("descrizione"));
-                app.setDataOra(rs.getTimestamp("data"));
-                app.setIdUtente(rs.getInt("id_utente"));
-                app.setCondiviso(rs.getBoolean("condiviso"));
+                app.setId(rs.getInt("ID"));
+                app.setTitolo(rs.getString("TITOLO"));
+                app.setDescrizione(rs.getString("DESCRIZIONE"));
+                app.setDataOra(rs.getTimestamp("DATA"));
+                app.setIdUtente(rs.getInt("ID_UTENTE"));
+                app.setCondiviso(rs.getBoolean("CONDIVISO"));
                 lista.add(app);
             }
         } catch (Exception e) {
