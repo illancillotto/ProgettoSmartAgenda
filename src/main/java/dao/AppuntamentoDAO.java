@@ -54,6 +54,29 @@ public class AppuntamentoDAO {
         }
     }
 
+    // Inserisci un nuovo appuntamento per un utente specifico (utile per admin)
+    public boolean insertForUser(Appuntamento app, int targetUserId) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "INSERT INTO APPUNTAMENTI (TITOLO, DESCRIZIONE, DATA, ID_UTENTE, CONDIVISO, ID_CATEGORIA) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, app.getTitolo());
+            ps.setString(2, app.getDescrizione());
+            ps.setTimestamp(3, new Timestamp(app.getDataOra().getTime()));
+            ps.setInt(4, targetUserId); // Usa l'ID utente specificato
+            ps.setBoolean(5, app.isCondiviso());
+            if (app.getIdCategoria() > 0) {
+                ps.setInt(6, app.getIdCategoria());
+            } else {
+                ps.setNull(6, java.sql.Types.INTEGER);
+            }
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // Trova appuntamento per ID
     public Appuntamento findById(int id) {
         try (Connection con = DBConnection.getConnection()) {
@@ -222,5 +245,95 @@ public class AppuntamentoDAO {
             e.printStackTrace();
         }
         return lista;
+    }
+
+    // Trova appuntamenti per più utenti (utile per admin)
+    public List<Appuntamento> findByMultipleUsers(List<Integer> userIds) {
+        List<Appuntamento> lista = new ArrayList<>();
+        if (userIds == null || userIds.isEmpty()) {
+            return lista;
+        }
+
+        try (Connection con = DBConnection.getConnection()) {
+            StringBuilder sql = new StringBuilder("SELECT a.*, u.USERNAME FROM APPUNTAMENTI a ");
+            sql.append("JOIN UTENTI u ON a.ID_UTENTE = u.ID ");
+            sql.append("WHERE a.ID_UTENTE IN (");
+            for (int i = 0; i < userIds.size(); i++) {
+                if (i > 0)
+                    sql.append(",");
+                sql.append("?");
+            }
+            sql.append(") ORDER BY a.DATA ASC");
+
+            PreparedStatement ps = con.prepareStatement(sql.toString());
+            for (int i = 0; i < userIds.size(); i++) {
+                ps.setInt(i + 1, userIds.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Appuntamento app = new Appuntamento();
+                app.setId(rs.getInt("ID"));
+                app.setTitolo(rs.getString("TITOLO"));
+                app.setDescrizione(rs.getString("DESCRIZIONE"));
+                app.setDataOra(rs.getTimestamp("DATA"));
+                app.setIdUtente(rs.getInt("ID_UTENTE"));
+                app.setUsername(rs.getString("USERNAME"));
+                app.setCondiviso(rs.getBoolean("CONDIVISO"));
+                app.setIdCategoria(rs.getInt("ID_CATEGORIA"));
+                lista.add(app);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+    // Conta appuntamenti per utente
+    public int countByUser(int idUtente) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT COUNT(*) FROM APPUNTAMENTI WHERE ID_UTENTE=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, idUtente);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // Verifica se un utente può modificare un appuntamento
+    public boolean canUserModifyAppointment(int appointmentId, int userId, boolean isAdmin) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT ID_UTENTE FROM APPUNTAMENTI WHERE ID=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, appointmentId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                int ownerId = rs.getInt("ID_UTENTE");
+                return isAdmin || ownerId == userId;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Trasferisci appuntamenti da un utente a un altro (utile per admin)
+    public boolean transferAppointments(int fromUserId, int toUserId) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "UPDATE APPUNTAMENTI SET ID_UTENTE=? WHERE ID_UTENTE=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, toUserId);
+            ps.setInt(2, fromUserId);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

@@ -191,4 +191,21 @@ public class CategoriaDAO {
         }
         return false;
     }
+
+    // Verifica se una categoria appartiene a un utente specifico
+    public boolean belongsToUser(int idCategoria, int idUtente) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT COUNT(*) FROM CATEGORIE WHERE ID = ? AND ID_UTENTE = ?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, idCategoria);
+            ps.setInt(2, idUtente);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

@@ -5,6 +5,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -59,6 +61,13 @@ public class AppuntamentoServlet extends HttpServlet {
             case "condivisi":
                 appuntamentiCondivisi(request, response, utente);
                 break;
+            case "stats":
+                if (utente.getRuolo().equals("admin")) {
+                    mostraStatistiche(request, response, utente);
+                } else {
+                    listaAppuntamenti(request, response, utente);
+                }
+                break;
             default:
                 listaAppuntamenti(request, response, utente);
         }
@@ -95,14 +104,17 @@ public class AppuntamentoServlet extends HttpServlet {
 
         AppuntamentoDAO appDAO = new AppuntamentoDAO();
         CategoriaDAO catDAO = new CategoriaDAO();
+        UtenteDAO userDAO = new UtenteDAO();
 
         List<Appuntamento> appuntamenti;
         List<Categoria> categorie;
+        List<Utente> utenti = null;
 
         // Se l'utente è admin, mostra tutti gli appuntamenti
         if (utente.getRuolo().equals("admin")) {
             appuntamenti = appDAO.findAllForAdmin();
             categorie = catDAO.findAll(); // Tutte le categorie per admin
+            utenti = userDAO.findAll(); // Tutti gli utenti per permettere la selezione
         } else {
             appuntamenti = appDAO.findByUtente(utente.getId());
             categorie = catDAO.findByUtente(utente.getId());
@@ -110,6 +122,7 @@ public class AppuntamentoServlet extends HttpServlet {
 
         request.setAttribute("appuntamenti", appuntamenti);
         request.setAttribute("categorie", categorie);
+        request.setAttribute("utenti", utenti); // Per gli admin
 
         RequestDispatcher rd = request.getRequestDispatcher("jsp/agenda.jsp");
         rd.forward(request, response);
@@ -125,6 +138,7 @@ public class AppuntamentoServlet extends HttpServlet {
             String oraStr = request.getParameter("ora");
             String condivisoStr = request.getParameter("condiviso");
             String categoriaStr = request.getParameter("categoria");
+            String targetUserIdStr = request.getParameter("targetUserId"); // Nuovo parametro per admin
 
             // Validazione input
             if (titolo == null || titolo.trim().isEmpty()) {
@@ -151,33 +165,75 @@ public class AppuntamentoServlet extends HttpServlet {
                 return;
             }
 
+            // Determina l'ID utente target
+            int targetUserId = utente.getId(); // Default: utente corrente
+
+            // Se è admin e ha specificato un target user, usa quello
+            if (utente.getRuolo().equals("admin") && targetUserIdStr != null && !targetUserIdStr.trim().isEmpty()) {
+                try {
+                    targetUserId = Integer.parseInt(targetUserIdStr);
+
+                    // Verifica che l'utente target esista
+                    UtenteDAO userDAO = new UtenteDAO();
+                    Utente targetUser = userDAO.findById(targetUserId);
+                    if (targetUser == null) {
+                        request.setAttribute("errore", "Utente specificato non trovato");
+                        listaAppuntamenti(request, response, utente);
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    request.setAttribute("errore", "ID utente non valido");
+                    listaAppuntamenti(request, response, utente);
+                    return;
+                }
+            }
+
             Appuntamento appuntamento = new Appuntamento();
             appuntamento.setTitolo(titolo.trim());
             appuntamento.setDescrizione(descrizione != null ? descrizione.trim() : "");
             appuntamento.setDataOra(dataOra);
-            appuntamento.setIdUtente(utente.getId());
             appuntamento.setCondiviso(condivisoStr != null && condivisoStr.equals("on"));
 
+            // Gestione categoria
             if (categoriaStr != null && !categoriaStr.trim().isEmpty()) {
                 try {
                     int idCategoria = Integer.parseInt(categoriaStr);
-                    appuntamento.setIdCategoria(idCategoria);
+
+                    // Verifica che la categoria appartenga all'utente target o sia dell'admin
+                    CategoriaDAO catDAO = new CategoriaDAO();
+                    if (utente.getRuolo().equals("admin") || catDAO.belongsToUser(idCategoria, targetUserId)) {
+                        appuntamento.setIdCategoria(idCategoria);
+                    }
                 } catch (NumberFormatException e) {
                     // Ignora categoria non valida
                 }
             }
 
             AppuntamentoDAO dao = new AppuntamentoDAO();
-            boolean success = dao.insert(appuntamento);
+            boolean success;
+
+            // Usa il metodo appropriato basato sul ruolo
+            if (utente.getRuolo().equals("admin") && targetUserId != utente.getId()) {
+                success = dao.insertForUser(appuntamento, targetUserId);
+            } else {
+                appuntamento.setIdUtente(utente.getId());
+                success = dao.insert(appuntamento);
+            }
 
             if (success) {
-                request.setAttribute("successo", "Appuntamento creato con successo!");
+                String successMessage = "Appuntamento creato con successo!";
+                if (utente.getRuolo().equals("admin") && targetUserId != utente.getId()) {
+                    UtenteDAO userDAO = new UtenteDAO();
+                    Utente targetUser = userDAO.findById(targetUserId);
+                    successMessage += " (per utente: " + targetUser.getUsername() + ")";
+                }
+                request.setAttribute("successo", successMessage);
 
                 // Crea notifica di promemoria se l'appuntamento è tra 24 ore
                 long timeDiff = dataOra.getTime() - System.currentTimeMillis();
                 if (timeDiff > 0 && timeDiff < 24 * 60 * 60 * 1000) { // Meno di 24 ore
                     NotificaDAO notDAO = new NotificaDAO();
-                    notDAO.createPromemoria(utente.getId(), titolo, dataOra);
+                    notDAO.createPromemoria(targetUserId, titolo, dataOra);
                 }
             } else {
                 request.setAttribute("errore", "Errore nella creazione dell'appuntamento");
@@ -403,9 +459,41 @@ public class AppuntamentoServlet extends HttpServlet {
         List<Appuntamento> appuntamenti = dao.findCondivisi();
 
         request.setAttribute("appuntamenti", appuntamenti);
-        request.setAttribute("condivisiMode", true);
+        request.setAttribute("tipoVista", "condivisi");
 
         RequestDispatcher rd = request.getRequestDispatcher("jsp/agenda.jsp");
+        rd.forward(request, response);
+    }
+
+    private void mostraStatistiche(HttpServletRequest request, HttpServletResponse response, Utente utente)
+            throws ServletException, IOException {
+
+        if (!utente.getRuolo().equals("admin")) {
+            response.sendRedirect(request.getContextPath() + "/agenda");
+            return;
+        }
+
+        UtenteDAO userDAO = new UtenteDAO();
+        AppuntamentoDAO appDAO = new AppuntamentoDAO();
+
+        List<Utente> utenti = userDAO.findAll();
+        Map<String, Integer> statistiche = new HashMap<>();
+
+        for (Utente u : utenti) {
+            int count = appDAO.countByUser(u.getId());
+            statistiche.put(u.getUsername(), count);
+        }
+
+        // Statistiche generali
+        int totalAppuntamenti = appDAO.findAllForAdmin().size();
+        int appuntamentiCondivisi = appDAO.findCondivisi().size();
+
+        request.setAttribute("utenti", utenti);
+        request.setAttribute("statistiche", statistiche);
+        request.setAttribute("totalAppuntamenti", totalAppuntamenti);
+        request.setAttribute("appuntamentiCondivisi", appuntamentiCondivisi);
+
+        RequestDispatcher rd = request.getRequestDispatcher("jsp/stats.jsp");
         rd.forward(request, response);
     }
 }
