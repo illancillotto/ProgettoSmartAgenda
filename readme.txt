@@ -94,4 +94,4 @@ Copia
 
 ---
 
-© Alessandro Porcu – Università eCampus
+© Alessandro Porcu 
