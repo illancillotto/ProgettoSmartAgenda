@@ -180,4 +180,21 @@ public class NotificaDAO {
             e.printStackTrace();
         }
     }
+
+    // Crea notifica di promemoria per appuntamento
+    public void createPromemoria(int idUtente, String titoloAppuntamento, java.util.Date dataAppuntamento) {
+        try {
+            Notifica notifica = new Notifica();
+            notifica.setIdUtente(idUtente);
+            notifica.setTitolo("Promemoria Appuntamento");
+            notifica.setMessaggio("Hai un appuntamento '" + titoloAppuntamento + "' programmato per oggi!");
+            notifica.setTipo("warning");
+            notifica.setLetta(false);
+            notifica.setDataScadenza(dataAppuntamento); // La notifica scade dopo l'appuntamento
+
+            insert(notifica);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
