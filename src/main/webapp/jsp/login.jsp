@@ -236,12 +236,15 @@
               <div class="demo-section">
                 <h6><i class="fas fa-eye"></i> Demo</h6>
                 <div class="demo-credentials">Admin: admin / admin123</div>
-                <div class="demo-credentials">Utente: demo / demo123</div>
+                <div class="demo-credentials">Utenti: tizio, caio, sempronio / (password uguale al nome + 123)</div>
                 <button type="button" class="btn-demo" onclick="fillDemo('admin', 'admin123')">
                   Login Admin
                 </button>
-                <button type="button" class="btn-demo" onclick="fillDemo('demo', 'demo123')">
-                  Login Demo
+                <button type="button" class="btn-demo" onclick="fillDemo('tizio', 'tizio123')">
+                  Login Tizio
+                </button>
+                <button type="button" class="btn-demo" onclick="fillDemo('caio', 'caio123')">
+                  Login Caio
                 </button>
               </div>
     </div>

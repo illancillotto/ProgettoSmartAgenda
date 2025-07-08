@@ -1,7 +1,8 @@
 <%@ page import="java.util.*, model.Appuntamento, model.Utente, model.Categoria" %>
     <% Utente utente=(Utente) session.getAttribute("utente"); if (utente==null) {
         response.sendRedirect(request.getContextPath() + "/jsp/login.jsp" ); return; } // Usa gli attributi impostati
-        dal servlet invece di fare query dirette List<Appuntamento> lista = (List<Appuntamento>)
+         
+        List<Appuntamento> lista = (List<Appuntamento>)
             request.getAttribute("appuntamenti");
             List<Categoria> categorie = (List<Categoria>) request.getAttribute("categorie");
                     List<Utente> utenti = (List<Utente>) request.getAttribute("utenti"); // Per admin
@@ -129,8 +130,7 @@
                                                                                     <tbody>
                                                                                         <% for(Appuntamento a : lista) {
                                                                                             %>
-                                                                                            <tr class="<%= a.isPassato() ? "
-                                                                                                table-secondary"
+                                                                                            <tr class="<%= a.isPassato() ? "table-secondary"
                                                                                                 :(a.isOggi()? "table-warning"
                                                                                                 : "" )%>">
 
@@ -188,8 +188,7 @@
                                                                                                                 { %>
                                                                                                                 <span
                                                                                                                     class="badge"
-                                                                                                                    style="background-color: <%= a.getColoreCategoria() != null ? a.getColoreCategoria() : "
-                                                                                                                    #6c757d"
+                                                                                                                    style="background-color: <%= a.getColoreCategoria() != null ? a.getColoreCategoria() : "#6c757d"
                                                                                                                     %>;
                                                                                                                     color:
                                                                                                                     white;">
@@ -394,8 +393,7 @@
                                                                                                         class="btn btn-primary"
                                                                                                         id="submitBtn"
                                                                                                         onclick="this.disabled=true; this.form.submit();">
-                                                                                                        <i class="fas fa-<%= editMode ? "
-                                                                                                            save"
+                                                                                                        <i class="fas fa-<%= editMode ? "save"
                                                                                                             : "plus"
                                                                                                             %>"></i>
                                                                                                         <%= editMode
