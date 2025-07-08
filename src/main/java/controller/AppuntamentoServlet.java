@@ -86,8 +86,8 @@ public class AppuntamentoServlet extends HttpServlet {
         String action = request.getParameter("action");
         if (action == null)
             action = "create";
-
-        switch (action) {
+        
+        switch (action.trim()) {
             case "create":
                 createAppuntamento(request, response, utente);
                 break;
@@ -274,6 +274,8 @@ public class AppuntamentoServlet extends HttpServlet {
 
             int id = Integer.parseInt(idStr);
             AppuntamentoDAO dao = new AppuntamentoDAO();
+
+            // Verifica che l'appuntamento esista prima di procedere
             Appuntamento appuntamento = dao.findById(id);
 
             System.out.println("DEBUG UPDATE - Appuntamento trovato: " + (appuntamento != null));
@@ -283,29 +285,45 @@ public class AppuntamentoServlet extends HttpServlet {
                 System.out.println("DEBUG UPDATE - Utente corrente: " + utente.getId());
             }
 
-            if (appuntamento == null
-                    || (appuntamento.getIdUtente() != utente.getId() && !utente.getRuolo().equals("admin"))) {
-                request.setAttribute("errore", "Appuntamento non trovato o non autorizzato");
+            if (appuntamento == null) {
+                request.setAttribute("errore", "Appuntamento non trovato");
                 listaAppuntamenti(request, response, utente);
                 return;
             }
 
-            // Aggiorna i campi
-            if (titolo != null && !titolo.trim().isEmpty()) {
-                appuntamento.setTitolo(titolo.trim());
+            // Verifica autorizzazioni
+            if (appuntamento.getIdUtente() != utente.getId() && !utente.getRuolo().equals("admin")) {
+                request.setAttribute("errore", "Non sei autorizzato a modificare questo appuntamento");
+                listaAppuntamenti(request, response, utente);
+                return;
             }
-            if (descrizione != null) {
-                appuntamento.setDescrizione(descrizione.trim());
+
+            // Validazione input
+            if (titolo == null || titolo.trim().isEmpty()) {
+                request.setAttribute("errore", "Il titolo è obbligatorio");
+                listaAppuntamenti(request, response, utente);
+                return;
             }
-            if (dataStr != null && !dataStr.trim().isEmpty()) {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                String dataOraStr = dataStr + " " + (oraStr != null ? oraStr : "00:00");
-                Date dataOra = sdf.parse(dataOraStr);
-                appuntamento.setDataOra(dataOra);
+
+            if (dataStr == null || dataStr.trim().isEmpty()) {
+                request.setAttribute("errore", "La data è obbligatoria");
+                listaAppuntamenti(request, response, utente);
+                return;
             }
+
+            // Aggiorna i campi dell'appuntamento esistente
+            appuntamento.setTitolo(titolo.trim());
+            appuntamento.setDescrizione(descrizione != null ? descrizione.trim() : "");
+
+            // Parsing data e ora
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            String dataOraStr = dataStr + " " + (oraStr != null ? oraStr : "00:00");
+            Date dataOra = sdf.parse(dataOraStr);
+            appuntamento.setDataOra(dataOra);
 
             appuntamento.setCondiviso(condivisoStr != null && condivisoStr.equals("on"));
 
+            // Gestione categoria
             if (categoriaStr != null && !categoriaStr.trim().isEmpty()) {
                 try {
                     int idCategoria = Integer.parseInt(categoriaStr);
@@ -317,16 +335,28 @@ public class AppuntamentoServlet extends HttpServlet {
                 appuntamento.setIdCategoria(0); // Rimuovi categoria se non selezionata
             }
 
-            // NON modificare l'ID utente - l'appuntamento mantiene il proprietario
-            // originale
-            // appuntamento.setIdUtente() non deve essere chiamato qui
+            // IMPORTANTE: Non modificare l'ID utente - l'appuntamento mantiene il
+            // proprietario originale
+            // appuntamento.setIdUtente() NON deve essere chiamato qui
 
             System.out.println("DEBUG UPDATE - Prima del save - ID: " + appuntamento.getId());
             System.out.println("DEBUG UPDATE - Prima del save - Utente: " + appuntamento.getIdUtente());
+            System.out.println("DEBUG UPDATE - Prima del save - Titolo: " + appuntamento.getTitolo());
 
-            boolean success = dao.update(appuntamento);
+            // Verifica ancora una volta che l'ID sia valido
+            if (appuntamento.getId() <= 0) {
+                request.setAttribute("errore", "ID appuntamento non valido per l'aggiornamento");
+                listaAppuntamenti(request, response, utente);
+                return;
+            }
 
-            System.out.println("DEBUG UPDATE - Risultato update: " + success);
+            // Usa il nuovo metodo updateOrReplace che elimina e reinserisce
+            boolean success = dao.updateOrReplace(appuntamento);
+
+            System.out.println("DEBUG UPDATE - Risultato updateOrReplace: " + success);
+            if (success) {
+                System.out.println("DEBUG UPDATE - Nuovo ID dopo updateOrReplace: " + appuntamento.getId());
+            }
 
             if (success) {
                 request.setAttribute("successo", "Appuntamento aggiornato con successo!");
@@ -336,6 +366,10 @@ public class AppuntamentoServlet extends HttpServlet {
 
         } catch (ParseException e) {
             request.setAttribute("errore", "Formato data/ora non valido");
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            request.setAttribute("errore", "ID appuntamento non valido");
+            e.printStackTrace();
         } catch (Exception e) {
             request.setAttribute("errore", "Errore interno: " + e.getMessage());
             e.printStackTrace();

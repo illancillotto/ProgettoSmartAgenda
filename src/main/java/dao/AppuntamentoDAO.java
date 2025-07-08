@@ -111,27 +111,86 @@ public class AppuntamentoDAO {
         return null;
     }
 
-    // Aggiorna un appuntamento
-    public boolean update(Appuntamento app) {
-        try (Connection con = DBConnection.getConnection()) {
-            String sql = "UPDATE APPUNTAMENTI SET TITOLO=?, DESCRIZIONE=?, DATA=?, CONDIVISO=?, ID_CATEGORIA=? WHERE ID=?";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, app.getTitolo());
-            ps.setString(2, app.getDescrizione());
-            ps.setTimestamp(3, new Timestamp(app.getDataOra().getTime()));
-            ps.setBoolean(4, app.isCondiviso());
-            if (app.getIdCategoria() > 0) {
-                ps.setInt(5, app.getIdCategoria());
-            } else {
-                ps.setNull(5, java.sql.Types.INTEGER);
+    // Aggiorna un appuntamento eliminando il vecchio e inserendo il nuovo
+    public boolean updateOrReplace(Appuntamento app) {
+        Connection con = null;
+        try {
+            con = DBConnection.getConnection();
+            con.setAutoCommit(false); // Inizia transazione
+
+            // Step 1: Elimina il vecchio appuntamento
+            String deleteSql = "DELETE FROM APPUNTAMENTI WHERE ID=?";
+            PreparedStatement deletePs = con.prepareStatement(deleteSql);
+            deletePs.setInt(1, app.getId());
+            int deletedRows = deletePs.executeUpdate();
+
+            System.out.println("DEBUG: Righe eliminate: " + deletedRows);
+
+            if (deletedRows == 0) {
+                con.rollback();
+                return false; // Appuntamento non trovato
             }
-            ps.setInt(6, app.getId());
-            int rows = ps.executeUpdate();
-            return rows > 0;
+
+            // Step 2: Inserisci il nuovo appuntamento con i dati aggiornati
+            String insertSql = "INSERT INTO APPUNTAMENTI (TITOLO, DESCRIZIONE, DATA, ID_UTENTE, CONDIVISO, ID_CATEGORIA) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement insertPs = con.prepareStatement(insertSql, PreparedStatement.RETURN_GENERATED_KEYS);
+            insertPs.setString(1, app.getTitolo());
+            insertPs.setString(2, app.getDescrizione());
+            insertPs.setTimestamp(3, new Timestamp(app.getDataOra().getTime()));
+            insertPs.setInt(4, app.getIdUtente());
+            insertPs.setBoolean(5, app.isCondiviso());
+
+            if (app.getIdCategoria() > 0) {
+                insertPs.setInt(6, app.getIdCategoria());
+            } else {
+                insertPs.setNull(6, java.sql.Types.INTEGER);
+            }
+
+            int insertedRows = insertPs.executeUpdate();
+            System.out.println("DEBUG: Righe inserite: " + insertedRows);
+
+            if (insertedRows > 0) {
+                // Ottieni il nuovo ID generato
+                ResultSet generatedKeys = insertPs.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int newId = generatedKeys.getInt(1);
+                    app.setId(newId); // Aggiorna l'ID nell'oggetto
+                    System.out.println("DEBUG: Nuovo ID generato: " + newId);
+                }
+
+                con.commit(); // Conferma transazione
+                return true;
+            } else {
+                con.rollback(); // Annulla transazione
+                return false;
+            }
+
         } catch (Exception e) {
+            try {
+                if (con != null) {
+                    con.rollback(); // Annulla transazione in caso di errore
+                }
+            } catch (Exception rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
             e.printStackTrace();
             return false;
+        } finally {
+            try {
+                if (con != null) {
+                    con.setAutoCommit(true); // Ripristina auto-commit
+                    con.close();
+                }
+            } catch (Exception closeEx) {
+                closeEx.printStackTrace();
+            }
         }
+    }
+
+    // Mantieni il vecchio metodo update per compatibilità (ora deprecato)
+    @Deprecated
+    public boolean update(Appuntamento app) {
+        return updateOrReplace(app);
     }
 
     // Elimina un appuntamento

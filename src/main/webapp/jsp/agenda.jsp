@@ -1,7 +1,7 @@
 <%@ page import="java.util.*, model.Appuntamento, model.Utente, model.Categoria" %>
     <% Utente utente=(Utente) session.getAttribute("utente"); if (utente==null) {
         response.sendRedirect(request.getContextPath() + "/jsp/login.jsp" ); return; } // Usa gli attributi impostati dal servlet invece di fare query dirette 
-    List<Appuntamento> lista = (List<Appuntamento>)
+        List<Appuntamento> lista = (List<Appuntamento>)
             request.getAttribute("appuntamenti");
             List<Categoria> categorie = (List<Categoria>) request.getAttribute("categorie");
                     List<Utente> utenti = (List<Utente>) request.getAttribute("utenti"); // Per admin
@@ -389,7 +389,9 @@
                                                                                                     class="d-flex gap-2">
                                                                                                     <button
                                                                                                         type="submit"
-                                                                                                        class="btn btn-primary">
+                                                                                                        class="btn btn-primary"
+                                                                                                        id="submitBtn"
+                                                                                                        onclick="this.disabled=true; this.form.submit();">
                                                                                                         <i class="fas fa-<%= editMode ? "save"
                                                                                                             : "plus"
                                                                                                             %>"></i>
