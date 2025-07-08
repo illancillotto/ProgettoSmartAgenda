@@ -86,7 +86,7 @@ public class AppuntamentoServlet extends HttpServlet {
         String action = request.getParameter("action");
         if (action == null)
             action = "create";
-        
+
         switch (action.trim()) {
             case "create":
                 createAppuntamento(request, response, utente);
