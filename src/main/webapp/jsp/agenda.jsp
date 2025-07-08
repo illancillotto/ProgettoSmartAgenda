@@ -1,7 +1,7 @@
 <%@ page import="java.util.*, model.Appuntamento, model.Utente, model.Categoria" %>
     <% Utente utente=(Utente) session.getAttribute("utente"); if (utente==null) {
-        response.sendRedirect(request.getContextPath() + "/jsp/login.jsp" ); return; } // Usa gli attributi impostati
-        dal servlet invece di fare query dirette List<Appuntamento> lista = (List<Appuntamento>)
+        response.sendRedirect(request.getContextPath() + "/jsp/login.jsp" ); return; } // Usa gli attributi impostati dal servlet invece di fare query dirette 
+    		List<Appuntamento> lista = (List<Appuntamento>)
             request.getAttribute("appuntamenti");
             List<Categoria> categorie = (List<Categoria>) request.getAttribute("categorie");
                     List<Utente> utenti = (List<Utente>) request.getAttribute("utenti"); // Per admin
@@ -125,8 +125,7 @@
                                                                                     <tbody>
                                                                                         <% for(Appuntamento a : lista) {
                                                                                             %>
-                                                                                            <tr class="<%= a.isPassato() ? "
-                                                                                                table-secondary"
+                                                                                            <tr class="<%= a.isPassato() ? "table-secondary"
                                                                                                 :(a.isOggi()? "table-warning"
                                                                                                 : "" )%>">
 
@@ -364,8 +363,7 @@
                                                                                                     <button
                                                                                                         type="submit"
                                                                                                         class="btn btn-primary">
-                                                                                                        <i class="fas fa-<%= editMode ? "
-                                                                                                            save"
+                                                                                                        <i class="fas fa-<%= editMode ? "save"
                                                                                                             : "plus"
                                                                                                             %>"></i>
                                                                                                         <%= editMode

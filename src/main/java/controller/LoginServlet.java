@@ -69,12 +69,8 @@ public class LoginServlet extends HttpServlet {
                 response.addCookie(usernameCookie);
             }
 
-            // Reindirizza in base al ruolo
-            if (utente.getRuolo().equals("admin")) {
-                response.sendRedirect(request.getContextPath() + "/jsp/admin.jsp");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/jsp/home.jsp");
-            }
+            // Reindirizza alla home page per tutti gli utenti
+            response.sendRedirect(request.getContextPath() + "/jsp/home.jsp");
 
         } else {
             // Login fallito
@@ -91,12 +87,8 @@ public class LoginServlet extends HttpServlet {
         // Controlla se l'utente è già loggato
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("utente") != null) {
-            Utente utente = (Utente) session.getAttribute("utente");
-            if (utente.getRuolo().equals("admin")) {
-                response.sendRedirect(request.getContextPath() + "/jsp/admin.jsp");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/jsp/home.jsp");
-            }
+            // Reindirizza alla home page per tutti gli utenti già loggati
+            response.sendRedirect(request.getContextPath() + "/jsp/home.jsp");
             return;
         }
 
