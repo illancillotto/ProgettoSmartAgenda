@@ -318,7 +318,7 @@ public class AppuntamentoServlet extends HttpServlet {
                 categorie = catDAO.findByUtente(utente.getId());
             }
 
-            request.setAttribute("appuntamento", appuntamento);
+            request.setAttribute("appuntamentoEdit", appuntamento);
             request.setAttribute("categorie", categorie);
             request.setAttribute("editMode", true);
 
