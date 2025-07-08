@@ -44,6 +44,29 @@ public class CategoriaDAO {
         return lista;
     }
 
+    // Trova tutte le categorie (per admin)
+    public List<Categoria> findAll() {
+        List<Categoria> lista = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT c.*, u.USERNAME FROM CATEGORIE c " +
+                    "JOIN UTENTI u ON c.ID_UTENTE = u.ID " +
+                    "ORDER BY u.USERNAME, c.NOME";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Categoria categoria = new Categoria();
+                categoria.setId(rs.getInt("ID"));
+                categoria.setNome(rs.getString("NOME"));
+                categoria.setColore(rs.getString("COLORE"));
+                categoria.setIdUtente(rs.getInt("ID_UTENTE"));
+                lista.add(categoria);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
     // Trova categoria per ID
     public Categoria findById(int id) {
         try (Connection con = DBConnection.getConnection()) {

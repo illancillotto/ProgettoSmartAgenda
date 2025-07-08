@@ -96,8 +96,17 @@ public class AppuntamentoServlet extends HttpServlet {
         AppuntamentoDAO appDAO = new AppuntamentoDAO();
         CategoriaDAO catDAO = new CategoriaDAO();
 
-        List<Appuntamento> appuntamenti = appDAO.findByUtente(utente.getId());
-        List<Categoria> categorie = catDAO.findByUtente(utente.getId());
+        List<Appuntamento> appuntamenti;
+        List<Categoria> categorie;
+
+        // Se l'utente è admin, mostra tutti gli appuntamenti
+        if (utente.getRuolo().equals("admin")) {
+            appuntamenti = appDAO.findAllForAdmin();
+            categorie = catDAO.findAll(); // Tutte le categorie per admin
+        } else {
+            appuntamenti = appDAO.findByUtente(utente.getId());
+            categorie = catDAO.findByUtente(utente.getId());
+        }
 
         request.setAttribute("appuntamenti", appuntamenti);
         request.setAttribute("categorie", categorie);
@@ -206,7 +215,8 @@ public class AppuntamentoServlet extends HttpServlet {
             AppuntamentoDAO dao = new AppuntamentoDAO();
             Appuntamento appuntamento = dao.findById(id);
 
-            if (appuntamento == null || appuntamento.getIdUtente() != utente.getId()) {
+            if (appuntamento == null
+                    || (appuntamento.getIdUtente() != utente.getId() && !utente.getRuolo().equals("admin"))) {
                 request.setAttribute("errore", "Appuntamento non trovato o non autorizzato");
                 listaAppuntamenti(request, response, utente);
                 return;
@@ -270,14 +280,20 @@ public class AppuntamentoServlet extends HttpServlet {
             AppuntamentoDAO dao = new AppuntamentoDAO();
             Appuntamento appuntamento = dao.findById(id);
 
-            if (appuntamento == null || appuntamento.getIdUtente() != utente.getId()) {
+            if (appuntamento == null
+                    || (appuntamento.getIdUtente() != utente.getId() && !utente.getRuolo().equals("admin"))) {
                 request.setAttribute("errore", "Appuntamento non trovato o non autorizzato");
                 listaAppuntamenti(request, response, utente);
                 return;
             }
 
             CategoriaDAO catDAO = new CategoriaDAO();
-            List<Categoria> categorie = catDAO.findByUtente(utente.getId());
+            List<Categoria> categorie;
+            if (utente.getRuolo().equals("admin")) {
+                categorie = catDAO.findAll();
+            } else {
+                categorie = catDAO.findByUtente(utente.getId());
+            }
 
             request.setAttribute("appuntamento", appuntamento);
             request.setAttribute("categorie", categorie);
@@ -308,7 +324,8 @@ public class AppuntamentoServlet extends HttpServlet {
             AppuntamentoDAO dao = new AppuntamentoDAO();
             Appuntamento appuntamento = dao.findById(id);
 
-            if (appuntamento == null || appuntamento.getIdUtente() != utente.getId()) {
+            if (appuntamento == null
+                    || (appuntamento.getIdUtente() != utente.getId() && !utente.getRuolo().equals("admin"))) {
                 request.setAttribute("errore", "Appuntamento non trovato o non autorizzato");
                 listaAppuntamenti(request, response, utente);
                 return;

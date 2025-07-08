@@ -181,4 +181,30 @@ public class AppuntamentoDAO {
         }
         return lista;
     }
+
+    // Trova tutti gli appuntamenti per admin (con username)
+    public List<Appuntamento> findAllForAdmin() {
+        List<Appuntamento> lista = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT a.*, u.USERNAME FROM APPUNTAMENTI a " +
+                    "JOIN UTENTI u ON a.ID_UTENTE = u.ID " +
+                    "ORDER BY a.DATA ASC";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Appuntamento app = new Appuntamento();
+                app.setId(rs.getInt("ID"));
+                app.setTitolo(rs.getString("TITOLO"));
+                app.setDescrizione(rs.getString("DESCRIZIONE"));
+                app.setDataOra(rs.getTimestamp("DATA"));
+                app.setIdUtente(rs.getInt("ID_UTENTE"));
+                app.setUsername(rs.getString("USERNAME"));
+                app.setCondiviso(rs.getBoolean("CONDIVISO"));
+                lista.add(app);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
 }

@@ -1,7 +1,8 @@
 <%@ page import="java.util.*, model.Appuntamento, model.Utente, model.Categoria" %>
     <% Utente utente=(Utente) session.getAttribute("utente"); if (utente==null) {
         response.sendRedirect(request.getContextPath() + "/jsp/login.jsp" ); return; } // Usa gli attributi impostati dal servlet invece di fare query dirette 
-        	List<Appuntamento> lista = (List<Appuntamento>)
+    		
+    		List<Appuntamento> lista = (List<Appuntamento>)
             request.getAttribute("appuntamenti");
             List<Categoria> categorie = (List<Categoria>) request.getAttribute("categorie");
                     Appuntamento appuntamentoEdit = (Appuntamento) request.getAttribute("appuntamento");
@@ -88,22 +89,29 @@
                                                                                             <th><i
                                                                                                     class="fas fa-heading"></i>
                                                                                                 Titolo</th>
-                                                                                            <th><i
-                                                                                                    class="fas fa-align-left"></i>
-                                                                                                Descrizione
-                                                                                            </th>
-                                                                                            <th><i
-                                                                                                    class="fas fa-share-alt"></i>
-                                                                                                Condiviso</th>
-                                                                                            <th><i
-                                                                                                    class="fas fa-cogs"></i>
-                                                                                                Azioni</th>
+                                                                                            <% if
+                                                                                                (utente.getRuolo().equals("admin"))
+                                                                                                { %>
+                                                                                                <th><i
+                                                                                                        class="fas fa-user"></i>
+                                                                                                    Utente</th>
+                                                                                                <% } %>
+                                                                                                    <th><i
+                                                                                                            class="fas fa-align-left"></i>
+                                                                                                        Descrizione
+                                                                                                    </th>
+                                                                                                    <th><i
+                                                                                                            class="fas fa-share-alt"></i>
+                                                                                                        Condiviso</th>
+                                                                                                    <th><i
+                                                                                                            class="fas fa-cogs"></i>
+                                                                                                        Azioni</th>
                                                                                         </tr>
                                                                                     </thead>
                                                                                     <tbody>
                                                                                         <% for(Appuntamento a : lista) {
                                                                                             %>
-																							<tr class="<%= a.isPassato() ? "table-secondary" : (a.isOggi() ? "table-warning" : "") %>">
+                                                                                            <tr class="<%= a.isPassato() ? "table-secondary" :(a.isOggi()? "table-warning" : "" )%>">
                                                                                                 <td>
                                                                                                     <%= a.getDataFormatted()
                                                                                                         %>
@@ -129,36 +137,52 @@
                                                                                                 <td>
                                                                                                     <%= a.getTitolo() %>
                                                                                                 </td>
-                                                                                                <td>
-                                                                                                    <%= a.getDescrizione()
-                                                                                                        !=null ?
-                                                                                                        a.getDescrizione()
-                                                                                                        : "-" %>
-                                                                                                </td>
-                                                                                                <td>
-                                                                                                    <% if
-                                                                                                        (a.isCondiviso())
-                                                                                                        { %>
+                                                                                                <% if
+                                                                                                    (utente.getRuolo().equals("admin"))
+                                                                                                    { %>
+                                                                                                    <td>
                                                                                                         <span
-                                                                                                            class="badge bg-success">Sì</span>
-                                                                                                        <% } else { %>
-                                                                                                            <span
-                                                                                                                class="badge bg-secondary">No</span>
-                                                                                                            <% } %>
-                                                                                                </td>
-                                                                                                <td>
-                                                                                                    <a href="<%= request.getContextPath() %>/agenda?action=edit&id=<%= a.getId() %>"
-                                                                                                        class="btn btn-sm btn-primary">
-                                                                                                        <i
-                                                                                                            class="fas fa-edit"></i>
-                                                                                                    </a>
-                                                                                                    <a href="<%= request.getContextPath() %>/agenda?action=delete&id=<%= a.getId() %>"
-                                                                                                        class="btn btn-sm btn-danger"
-                                                                                                        onclick="return confirm('Sei sicuro di voler eliminare questo appuntamento?')">
-                                                                                                        <i
-                                                                                                            class="fas fa-trash"></i>
-                                                                                                    </a>
-                                                                                                </td>
+                                                                                                            class="badge bg-primary">
+                                                                                                            <%= a.getUsername()
+                                                                                                                !=null ?
+                                                                                                                a.getUsername()
+                                                                                                                : "N/A"
+                                                                                                                %>
+                                                                                                        </span>
+                                                                                                    </td>
+                                                                                                    <% } %>
+                                                                                                        <td>
+                                                                                                            <%= a.getDescrizione()
+                                                                                                                !=null ?
+                                                                                                                a.getDescrizione()
+                                                                                                                : "-" %>
+                                                                                                        </td>
+                                                                                                        <td>
+                                                                                                            <% if
+                                                                                                                (a.isCondiviso())
+                                                                                                                { %>
+                                                                                                                <span
+                                                                                                                    class="badge bg-success">Sì</span>
+                                                                                                                <% } else
+                                                                                                                    { %>
+                                                                                                                    <span
+                                                                                                                        class="badge bg-secondary">No</span>
+                                                                                                                    <% }
+                                                                                                                        %>
+                                                                                                        </td>
+                                                                                                        <td>
+                                                                                                            <a href="<%= request.getContextPath() %>/agenda?action=edit&id=<%= a.getId() %>"
+                                                                                                                class="btn btn-sm btn-primary">
+                                                                                                                <i
+                                                                                                                    class="fas fa-edit"></i>
+                                                                                                            </a>
+                                                                                                            <a href="<%= request.getContextPath() %>/agenda?action=delete&id=<%= a.getId() %>"
+                                                                                                                class="btn btn-sm btn-danger"
+                                                                                                                onclick="return confirm('Sei sicuro di voler eliminare questo appuntamento?')">
+                                                                                                                <i
+                                                                                                                    class="fas fa-trash"></i>
+                                                                                                            </a>
+                                                                                                        </td>
                                                                                             </tr>
                                                                                             <% } %>
                                                                                     </tbody>
@@ -267,8 +291,7 @@
                                                                                         <div class="d-flex gap-2">
                                                                                             <button type="submit"
                                                                                                 class="btn btn-primary">
-                                                                                                <i class="fas fa-<%= editMode ? "save" : "plus"
-                                                                                                    %>"></i>
+                                                                                                <i class="fas fa-<%= editMode ? "save" : "plus"%>"></i>
                                                                                                 <%= editMode
                                                                                                     ? "Salva Modifiche"
                                                                                                     : "Aggiungi Appuntamento"
