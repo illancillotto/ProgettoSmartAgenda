@@ -7,8 +7,9 @@
 .env
 .env.local
 
-# Directory di build temporanee
-target/
+# Directory di build temporanee (eccetto il WAR necessario)
+target/*
+!target/SmartAgenda.war
 build/
 dist/
 
