@@ -6,9 +6,17 @@ di categorizzazione, condivisione e gestione multi-utente.
 
 SETUP DATABASE
 --------------
-1. Eseguire il file setup_smartagenda.sql per creare il database e le tabelle
-2. Il database verrà creato con il nome SMARTAGENDA
-3. Verrà creato l'utente MySQL 'alessandro' con password 'studenteEcampus2025'
+
+**METODO 1: Docker (Raccomandato)**
+- Il database viene creato automaticamente dai container Docker
+- Nessuna configurazione manuale necessaria
+- Tutti gli utenti demo vengono creati automaticamente
+
+**METODO 2: Setup Manuale (Solo per deployment tradizionale)**
+1. Installare MySQL server
+2. Eseguire manualmente il file setup_smartagenda.sql per creare il database e le tabelle
+3. Il database verrà creato con il nome SMARTAGENDA
+4. Verrà creato l'utente MySQL 'alessandro' con password 'studenteEcampus2025'
 
 UTENTI DEMO
 -----------
@@ -86,10 +94,24 @@ src/main/webapp/
 
 DEPLOYMENT
 ----------
+
+**OPZIONE 1: Docker (Raccomandato per Distribuzione)**
+1. Installare Docker e Docker Compose
+2. Avviare con un comando:
+   - **Linux/macOS**: `./start.sh`
+   - **Windows**: `start.bat`
+3. Accedere a http://localhost:8080
+
+**OPZIONE 2: Deployment Tradizionale**
 1. Configurare il database MySQL
-2. Eseguire setup_smartagenda.sql
+2. Importare manualmente setup_smartagenda.sql
 3. Configurare il context.xml con i parametri del database
 4. Deployare su server Tomcat
 5. Accedere all'applicazione via browser
+
+**File di Setup Disponibili:**
+- **Docker**: Dockerfile, docker-compose.yml, build.sh/.bat, start.sh/.bat
+- **Database**: setup_smartagenda.sql (per deployment tradizionale)
+- **Documentazione**: DOCKER_README.md per deployment containerizzato
 
 Per ulteriori informazioni consultare la documentazione tecnica inclusa. 

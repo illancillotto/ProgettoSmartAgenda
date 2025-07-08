@@ -1,0 +1,53 @@
+# File di documentazione
+*.md
+*.txt
+*.pdf
+
+# File di configurazione locale
+.env
+.env.local
+
+# Directory di build temporanee
+target/
+build/
+dist/
+
+# File di log
+*.log
+logs/
+
+# File di sistema
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# Node modules (se presenti)
+node_modules/
+
+# File temporanei
+*.tmp
+*.temp
+sources.txt
+
+# Script di build (non necessari nel container)
+build.sh
+build.bat
+start.sh
+start.bat
+
+# Mantieni solo i file necessari per Docker
+!docker/
+!src/
+!setup_smartagenda.sql
+!Dockerfile
+!docker-compose.yml 
