@@ -1,97 +1,95 @@
-# SmartAgenda – Web Application per gestione appuntamenti
+SMART AGENDA - Sistema di Gestione Appuntamenti
+=============================================
 
-Progetto realizzato in JavaEE (Servlet + JSP) con pattern MVC, database MySQL e deploy su Tomcat 9.  
-L'applicazione consente la registrazione utenti, login, gestione agenda personale e condivisa.
+Un'applicazione web Java per la gestione di appuntamenti con funzionalità avanzate
+di categorizzazione, condivisione e gestione multi-utente.
 
----
+SETUP DATABASE
+--------------
+1. Eseguire il file setup_smartagenda.sql per creare il database e le tabelle
+2. Il database verrà creato con il nome SMARTAGENDA
+3. Verrà creato l'utente MySQL 'alessandro' con password 'studenteEcampus2025'
 
-## ✅ Requisiti
+UTENTI DEMO
+-----------
+Il sistema include diversi utenti demo per testare le funzionalità:
 
-- Java JDK 17
-- Apache Tomcat 9.x
-- MySQL Server (5.7 o 8.x)
-- Eclipse EE o altro IDE compatibile
-- MySQL Connector/J (`mysql-connector-java-8.x.x.jar`) incluso in `WEB-INF/lib`
+1. AMMINISTRATORE
+   - Username: admin
+   - Password: admin123
+   - Email: admin@smartagenda.com
+   - Ruolo: admin
+   - Funzionalità: Gestione completa del sistema, statistiche, creazione appuntamenti per altri utenti
 
----
+2. TIZIO
+   - Username: tizio
+   - Password: tizio123
+   - Email: tizio@smartagenda.com
+   - Ruolo: utente
+   - Categorie: Lavoro (blu), Sport (verde acqua), Famiglia (rosa)
+   - Appuntamenti: Riunioni di lavoro, allenamenti, cene familiari
 
-## 📁 Struttura del progetto
+3. CAIO
+   - Username: caio
+   - Password: caio123
+   - Email: caio@smartagenda.com
+   - Ruolo: utente
+   - Categorie: Università (viola), Hobby (arancione), Medico (rosso)
+   - Appuntamenti: Esami universitari, corsi di chitarra, visite mediche
 
-ProgettoSmartAgenda/
-│
-├── src/ # Codice Java (model, dao, controller)
-├── src/main/webapp/ # Contenuti web (jsp, WEB-INF)
-│ ├── jsp/
-│ │ ├── login.jsp
-│ │ ├── registration.jsp
-│ │ ├── agenda.jsp
-│ │ └── nuovoAppuntamento.jsp
-│ └── WEB-INF/
-│ ├── db.properties # Configurazione DB (non esportare con credenziali reali)
-│ └── web.xml
-│
-├── setup_smartagenda.sql # Script per creare DB, utente, tabelle
-├── README.txt # Istruzioni (questo file)
- 
----
+4. SEMPRONIO
+   - Username: sempronio
+   - Password: sempronio123
+   - Email: sempronio@smartagenda.com
+   - Ruolo: utente
+   - Categorie: Lavoro (grigio scuro), Viaggi (azzurro), Casa (verde)
+   - Appuntamenti: Meeting clienti, organizzazione viaggi, pulizie domestiche
 
-## ⚙️ Configurazione MySQL
+**Diversità di Profili:**
+- **tizio:** Professionista generico con vita sociale
+- **caio:** Studente universitario con hobby e salute
+- **sempronio:** Manager con focus su lavoro e lifestyle
 
-1. Apri un terminale e lancia il seguente comando:
-mysql -u root -p < setup_smartagenda.sql
+FUNZIONALITÀ PRINCIPALI
+-----------------------
+- Gestione appuntamenti con data, ora, titolo e descrizione
+- Sistema di categorie personalizzabili con colori
+- Condivisione appuntamenti tra utenti
+- Vista calendario con evidenziazione appuntamenti passati/odierni
+- Ricerca appuntamenti per titolo/descrizione
+- Dashboard statistiche per amministratori
+- Gestione multi-utente con ruoli differenziati
+- Sistema di notifiche e promemoria
 
-yaml
-Copia
+CARATTERISTICHE TECNICHE
+------------------------
+- Architettura MVC con servlet Java
+- Database MySQL con relazioni normalizzate
+- Frontend responsive con Bootstrap 5
+- Sicurezza con hash SHA-256 per le password
+- Gestione sessioni utente
+- Filtri di autenticazione
+- Pattern DAO per accesso ai dati
 
-Oppure, accedi a MySQL da terminale o phpMyAdmin e copia manualmente il contenuto di `setup_smartagenda.sql`.
+STRUTTURA PROGETTO
+------------------
+src/main/java/
+├── controller/     # Servlet per gestione richieste
+├── dao/           # Data Access Objects
+├── model/         # Classi modello
+└── filter/        # Filtri per autenticazione
 
-2. Lo script crea:
-- Database `smartagenda`
-- Utente `alessandro` con password `studenteEcampus2025`
-- Tabelle `utenti` e `appuntamenti`
+src/main/webapp/
+├── jsp/           # Pagine JSP
+├── WEB-INF/       # Configurazioni
+└── META-INF/      # Metadati applicazione
 
----
+DEPLOYMENT
+----------
+1. Configurare il database MySQL
+2. Eseguire setup_smartagenda.sql
+3. Configurare il context.xml con i parametri del database
+4. Deployare su server Tomcat
+5. Accedere all'applicazione via browser
 
-## 🔑 File `WEB-INF/db.properties`
-
-Contiene la configurazione del database:
-db.url=jdbc:mysql://localhost:3306/smartagenda
-db.user=alessandro
-db.password=studenteEcampus2025
-
-yaml
-Copia
-
-**⚠️ Non inserire questo file in repository pubblici se contiene credenziali reali.**
-
----
-
-## 🚀 Deploy del progetto
-
-1. Importa il progetto in Eclipse come *Dynamic Web Project*.
-2. Aggiungi il server **Apache Tomcat 9**.
-3. Fai clic destro → Run on Server.
-4. Visita:  
-   `http://localhost:8080/ProgettoSmartAgenda/jsp/login.jsp`
-
----
-
-## 🧪 Funzionalità disponibili
-
-- Registrazione nuovo utente
-- Login e sessione autenticata
-- Visualizzazione degli appuntamenti personali
-- Inserimento appuntamenti (con campo “condiviso”)
-- Logout
-
----
-
-## 📌 Note finali
-
-- Il file `db.properties` viene letto da `/WEB-INF/` tramite `ServletContext`.
-- Il driver JDBC è incluso manualmente nella cartella `WEB-INF/lib`.
-- Non è necessario Maven, il progetto è pensato per essere facilmente esportabile e avviabile in ambiente accademico o didattico.
-
----
-
-© Alessandro Porcu 
+Per ulteriori informazioni consultare la documentazione tecnica inclusa. 
