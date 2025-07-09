@@ -229,7 +229,8 @@
               </div>
 
               <div class="register-link">
-                <p>Non hai un account? <a href="registration.jsp">Registrati qui</a></p>
+                <p>Non hai un account? <a href="<%= request.getContextPath() %>/jsp/registration.jsp">Registrati qui</a>
+                </p>
               </div>
 
               <!-- Sezione demo -->
