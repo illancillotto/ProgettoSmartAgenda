@@ -9,6 +9,8 @@ public class Utente {
 	private String email;
 	private String ruolo;
 	private Date dataRegistrazione;
+	private String stato; // "attivo", "inattivo", "bloccato"
+	private Date ultimoAccesso;
 
 	// Costruttore vuoto e completo
 	public Utente() {
@@ -20,6 +22,7 @@ public class Utente {
 		this.password = password;
 		this.email = email;
 		this.ruolo = ruolo;
+		this.stato = "attivo"; // Default
 	}
 
 	// Getter e Setter
@@ -71,4 +74,44 @@ public class Utente {
 		this.dataRegistrazione = dataRegistrazione;
 	}
 
+	public String getStato() {
+		return stato;
+	}
+
+	public void setStato(String stato) {
+		this.stato = stato;
+	}
+
+	public Date getUltimoAccesso() {
+		return ultimoAccesso;
+	}
+
+	public void setUltimoAccesso(Date ultimoAccesso) {
+		this.ultimoAccesso = ultimoAccesso;
+	}
+
+	// Metodi di utilità
+	public boolean isAttivo() {
+		return "attivo".equals(stato);
+	}
+
+	public boolean isBloccato() {
+		return "bloccato".equals(stato);
+	}
+
+	public boolean isInattivo() {
+		return "inattivo".equals(stato);
+	}
+
+	public boolean isAdmin() {
+		return "admin".equals(ruolo);
+	}
+
+	public boolean isUtente() {
+		return "utente".equals(ruolo);
+	}
+
+	public boolean isOspite() {
+		return "ospite".equals(ruolo);
+	}
 }

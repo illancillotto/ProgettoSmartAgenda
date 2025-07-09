@@ -37,7 +37,7 @@
                     <span class="badge bg-danger ms-2">Admin</span>
                 <% } %>
             </span>
-            <a href="<%= request.getContextPath() %>/home" class="btn btn-outline-light btn-sm me-2">
+            <a href="<%= request.getContextPath() %>/jsp/home.jsp" class="btn btn-outline-light btn-sm me-2">
                 <i class="fas fa-home"></i> Home
             </a>
             <a href="<%= request.getContextPath() %>/logout" class="btn btn-outline-light btn-sm">

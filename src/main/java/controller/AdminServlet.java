@@ -2,6 +2,7 @@ package controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -15,6 +16,7 @@ import dao.NotificaDAO;
 import dao.DBConnection;
 import model.Utente;
 import model.Appuntamento;
+import model.Notifica;
 
 public class AdminServlet extends HttpServlet {
 
@@ -56,6 +58,21 @@ public class AdminServlet extends HttpServlet {
             case "searchUsers":
                 searchUtenti(request, response, utente);
                 break;
+            case "blockUser":
+                bloccaUtente(request, response, utente);
+                break;
+            case "unblockUser":
+                sbloccaUtente(request, response, utente);
+                break;
+            case "activateUser":
+                attivaUtente(request, response, utente);
+                break;
+            case "notifications":
+                gestisciNotifiche(request, response, utente);
+                break;
+            case "stats":
+                statistiche(request, response, utente);
+                break;
             default:
                 dashboard(request, response, utente);
         }
@@ -88,6 +105,9 @@ public class AdminServlet extends HttpServlet {
             case "resetPassword":
                 resetPassword(request, response, utente);
                 break;
+            case "sendSystemNotification":
+                sendSystemNotification(request, response, utente);
+                break;
             default:
                 dashboard(request, response, utente);
         }
@@ -102,12 +122,14 @@ public class AdminServlet extends HttpServlet {
         // Statistiche generali
         List<Utente> utenti = userDAO.findAll();
         List<Appuntamento> appuntamentiCondivisi = appDAO.findCondivisi();
+        Map<String, Integer> statsUtenti = userDAO.getStatisticheUtenti();
 
         request.setAttribute("totalUsers", utenti.size());
         request.setAttribute("totalAppointments", appuntamentiCondivisi.size());
         request.setAttribute("recentUsers", utenti.subList(0, Math.min(5, utenti.size())));
         request.setAttribute("recentAppointments",
                 appuntamentiCondivisi.subList(0, Math.min(5, appuntamentiCondivisi.size())));
+        request.setAttribute("statsUtenti", statsUtenti);
 
         RequestDispatcher rd = request.getRequestDispatcher("jsp/admin.jsp");
         rd.forward(request, response);
@@ -134,6 +156,36 @@ public class AdminServlet extends HttpServlet {
 
         request.setAttribute("appuntamenti", appuntamenti);
         request.setAttribute("currentSection", "appointments");
+
+        RequestDispatcher rd = request.getRequestDispatcher("jsp/admin.jsp");
+        rd.forward(request, response);
+    }
+
+    private void gestisciNotifiche(HttpServletRequest request, HttpServletResponse response, Utente utente)
+            throws ServletException, IOException {
+
+        NotificaDAO dao = new NotificaDAO();
+        List<Notifica> notifiche = dao.findAll();
+
+        request.setAttribute("notifiche", notifiche);
+        request.setAttribute("currentSection", "notifications");
+
+        RequestDispatcher rd = request.getRequestDispatcher("jsp/admin.jsp");
+        rd.forward(request, response);
+    }
+
+    private void statistiche(HttpServletRequest request, HttpServletResponse response, Utente utente)
+            throws ServletException, IOException {
+
+        UtenteDAO userDAO = new UtenteDAO();
+        AppuntamentoDAO appDAO = new AppuntamentoDAO();
+
+        Map<String, Integer> statsUtenti = userDAO.getStatisticheUtenti();
+        List<Appuntamento> appuntamentiCondivisi = appDAO.findCondivisi();
+
+        request.setAttribute("statsUtenti", statsUtenti);
+        request.setAttribute("appuntamentiCondivisi", appuntamentiCondivisi);
+        request.setAttribute("currentSection", "stats");
 
         RequestDispatcher rd = request.getRequestDispatcher("jsp/admin.jsp");
         rd.forward(request, response);
@@ -267,6 +319,116 @@ public class AdminServlet extends HttpServlet {
         gestisciUtenti(request, response, utente);
     }
 
+    private void bloccaUtente(HttpServletRequest request, HttpServletResponse response, Utente utente)
+            throws ServletException, IOException {
+
+        try {
+            String userIdStr = request.getParameter("id");
+            if (userIdStr == null || userIdStr.trim().isEmpty()) {
+                request.setAttribute("errore", "ID utente non valido");
+                gestisciUtenti(request, response, utente);
+                return;
+            }
+
+            int userId = Integer.parseInt(userIdStr);
+
+            // Verifica che non si stia bloccando se stesso
+            if (userId == utente.getId()) {
+                request.setAttribute("errore", "Non puoi bloccare te stesso");
+                gestisciUtenti(request, response, utente);
+                return;
+            }
+
+            UtenteDAO dao = new UtenteDAO();
+            boolean success = dao.bloccaUtente(userId);
+
+            if (success) {
+                request.setAttribute("successo", "Utente bloccato con successo!");
+            } else {
+                request.setAttribute("errore", "Errore nel blocco dell'utente");
+            }
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("errore", "ID utente non valido");
+        } catch (Exception e) {
+            request.setAttribute("errore", "Errore interno: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        gestisciUtenti(request, response, utente);
+    }
+
+    private void sbloccaUtente(HttpServletRequest request, HttpServletResponse response, Utente utente)
+            throws ServletException, IOException {
+
+        try {
+            String userIdStr = request.getParameter("id");
+            if (userIdStr == null || userIdStr.trim().isEmpty()) {
+                request.setAttribute("errore", "ID utente non valido");
+                gestisciUtenti(request, response, utente);
+                return;
+            }
+
+            int userId = Integer.parseInt(userIdStr);
+            UtenteDAO dao = new UtenteDAO();
+            boolean success = dao.sbloccaUtente(userId);
+
+            if (success) {
+                request.setAttribute("successo", "Utente sbloccato con successo!");
+            } else {
+                request.setAttribute("errore", "Errore nello sblocco dell'utente");
+            }
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("errore", "ID utente non valido");
+        } catch (Exception e) {
+            request.setAttribute("errore", "Errore interno: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        gestisciUtenti(request, response, utente);
+    }
+
+    private void attivaUtente(HttpServletRequest request, HttpServletResponse response, Utente utente)
+            throws ServletException, IOException {
+
+        try {
+            String userIdStr = request.getParameter("id");
+            if (userIdStr == null || userIdStr.trim().isEmpty()) {
+                request.setAttribute("errore", "ID utente non valido");
+                gestisciUtenti(request, response, utente);
+                return;
+            }
+
+            int userId = Integer.parseInt(userIdStr);
+            UtenteDAO dao = new UtenteDAO();
+
+            // Attiva l'utente e cambia il ruolo da ospite a utente
+            boolean success = dao.sbloccaUtente(userId);
+            if (success) {
+                Utente utenteToActivate = dao.findById(userId);
+                if (utenteToActivate != null && utenteToActivate.isOspite()) {
+                    utenteToActivate.setRuolo("utente");
+                    success = dao.update(utenteToActivate);
+                }
+            }
+
+            if (success) {
+                request.setAttribute("successo", "Utente attivato con successo!");
+            } else {
+                request.setAttribute("errore", "Errore nell'attivazione dell'utente");
+            }
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("errore", "ID utente non valido");
+        } catch (Exception e) {
+            request.setAttribute("errore", "Errore interno: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        gestisciUtenti(request, response, utente);
+    }
+
     private void searchUtenti(HttpServletRequest request, HttpServletResponse response, Utente utente)
             throws ServletException, IOException {
 
@@ -370,6 +532,47 @@ public class AdminServlet extends HttpServlet {
         }
 
         dashboard(request, response, utente);
+    }
+
+    private void sendSystemNotification(HttpServletRequest request, HttpServletResponse response, Utente utente)
+            throws ServletException, IOException {
+
+        try {
+            String titolo = request.getParameter("titolo");
+            String messaggio = request.getParameter("messaggio");
+            String tipo = request.getParameter("tipo");
+            String targetUsers = request.getParameter("targetUsers"); // "all", "active", "inactive"
+
+            if (titolo == null || messaggio == null || tipo == null ||
+                    titolo.trim().isEmpty() || messaggio.trim().isEmpty()) {
+                request.setAttribute("errore", "Titolo e messaggio sono obbligatori");
+                gestisciNotifiche(request, response, utente);
+                return;
+            }
+
+            NotificaDAO dao = new NotificaDAO();
+            boolean success = false;
+
+            if ("all".equals(targetUsers)) {
+                success = dao.sendToAll(titolo.trim(), messaggio.trim(), tipo);
+            } else if ("active".equals(targetUsers)) {
+                success = dao.sendToActiveUsers(titolo.trim(), messaggio.trim(), tipo);
+            } else if ("inactive".equals(targetUsers)) {
+                success = dao.sendToInactiveUsers(titolo.trim(), messaggio.trim(), tipo);
+            }
+
+            if (success) {
+                request.setAttribute("successo", "Notifica di sistema inviata con successo!");
+            } else {
+                request.setAttribute("errore", "Errore nell'invio della notifica di sistema");
+            }
+
+        } catch (Exception e) {
+            request.setAttribute("errore", "Errore interno: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        gestisciNotifiche(request, response, utente);
     }
 
     private void resetPassword(HttpServletRequest request, HttpServletResponse response, Utente utente)

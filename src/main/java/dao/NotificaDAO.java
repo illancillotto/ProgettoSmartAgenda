@@ -225,4 +225,141 @@ public class NotificaDAO {
             return false;
         }
     }
+
+    // Invia notifica solo agli utenti attivi
+    public boolean sendToActiveUsers(String titolo, String messaggio, String tipo) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "INSERT INTO NOTIFICHE (ID_UTENTE, TITOLO, MESSAGGIO, TIPO) " +
+                    "SELECT ID, ?, ?, ? FROM UTENTI WHERE ATTIVO = true AND RUOLO != 'ospite'";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, titolo);
+            ps.setString(2, messaggio);
+            ps.setString(3, tipo);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Invia notifica solo agli utenti inattivi
+    public boolean sendToInactiveUsers(String titolo, String messaggio, String tipo) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "INSERT INTO NOTIFICHE (ID_UTENTE, TITOLO, MESSAGGIO, TIPO) " +
+                    "SELECT ID, ?, ?, ? FROM UTENTI WHERE ATTIVO = false";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, titolo);
+            ps.setString(2, messaggio);
+            ps.setString(3, tipo);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Trova tutte le notifiche (per admin)
+    public List<Notifica> findAll() {
+        List<Notifica> lista = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT n.*, u.USERNAME FROM NOTIFICHE n " +
+                    "LEFT JOIN UTENTI u ON n.ID_UTENTE = u.ID " +
+                    "ORDER BY n.DATA_CREAZIONE DESC";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Notifica notifica = new Notifica();
+                notifica.setId(rs.getInt("ID"));
+                notifica.setIdUtente(rs.getInt("ID_UTENTE"));
+                notifica.setTitolo(rs.getString("TITOLO"));
+                notifica.setMessaggio(rs.getString("MESSAGGIO"));
+                notifica.setTipo(rs.getString("TIPO"));
+                notifica.setLetta(rs.getBoolean("LETTA"));
+                notifica.setDataCreazione(rs.getTimestamp("DATA_CREAZIONE"));
+                notifica.setDataScadenza(rs.getTimestamp("DATA_SCADENZA"));
+                lista.add(notifica);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+    // Trova notifiche per tipo
+    public List<Notifica> findByTipo(String tipo) {
+        List<Notifica> lista = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT * FROM NOTIFICHE WHERE TIPO = ? ORDER BY DATA_CREAZIONE DESC";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, tipo);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Notifica notifica = new Notifica();
+                notifica.setId(rs.getInt("ID"));
+                notifica.setIdUtente(rs.getInt("ID_UTENTE"));
+                notifica.setTitolo(rs.getString("TITOLO"));
+                notifica.setMessaggio(rs.getString("MESSAGGIO"));
+                notifica.setTipo(rs.getString("TIPO"));
+                notifica.setLetta(rs.getBoolean("LETTA"));
+                notifica.setDataCreazione(rs.getTimestamp("DATA_CREAZIONE"));
+                notifica.setDataScadenza(rs.getTimestamp("DATA_SCADENZA"));
+                lista.add(notifica);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+    // Conta notifiche per tipo
+    public int countByTipo(String tipo) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT COUNT(*) FROM NOTIFICHE WHERE TIPO = ?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, tipo);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // Ottieni statistiche notifiche
+    public Map<String, Integer> getStatisticheNotifiche() {
+        Map<String, Integer> stats = new HashMap<>();
+        try (Connection con = DBConnection.getConnection()) {
+            // Conta notifiche totali
+            String sql1 = "SELECT COUNT(*) FROM NOTIFICHE";
+            PreparedStatement ps1 = con.prepareStatement(sql1);
+            ResultSet rs1 = ps1.executeQuery();
+            if (rs1.next()) {
+                stats.put("totali", rs1.getInt(1));
+            }
+
+            // Conta notifiche non lette
+            String sql2 = "SELECT COUNT(*) FROM NOTIFICHE WHERE LETTA = false";
+            PreparedStatement ps2 = con.prepareStatement(sql2);
+            ResultSet rs2 = ps2.executeQuery();
+            if (rs2.next()) {
+                stats.put("nonLette", rs2.getInt(1));
+            }
+
+            // Conta notifiche per tipo
+            String sql3 = "SELECT TIPO, COUNT(*) FROM NOTIFICHE GROUP BY TIPO";
+            PreparedStatement ps3 = con.prepareStatement(sql3);
+            ResultSet rs3 = ps3.executeQuery();
+            while (rs3.next()) {
+                stats.put(rs3.getString("TIPO"), rs3.getInt(2));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
 }

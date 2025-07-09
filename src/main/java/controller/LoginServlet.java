@@ -45,7 +45,14 @@ public class LoginServlet extends HttpServlet {
 
         if (utente != null) {
             // Verifica se l'utente è attivo
-            if (utente.getRuolo().equals("ospite")) {
+            if (!utente.isAttivo()) {
+                request.setAttribute("errore", "Account bloccato. Contatta l'amministratore.");
+                request.setAttribute("username", username);
+                forwardToLogin(request, response);
+                return;
+            }
+
+            if (utente.isOspite()) {
                 request.setAttribute("errore", "Account non attivato. Contatta l'amministratore.");
                 request.setAttribute("username", username);
                 forwardToLogin(request, response);
@@ -115,8 +122,7 @@ public class LoginServlet extends HttpServlet {
     private void updateLastAccess(int userId) {
         try {
             UtenteDAO dao = new UtenteDAO();
-            // Qui potresti aggiornare il campo ultimo_accesso se lo aggiungi al DAO
-            // dao.updateLastAccess(userId, new Timestamp(System.currentTimeMillis()));
+            dao.updateUltimoAccesso(userId);
         } catch (Exception e) {
             // Log dell'errore ma non bloccare il login
             e.printStackTrace();

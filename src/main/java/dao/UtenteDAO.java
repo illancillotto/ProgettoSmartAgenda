@@ -27,7 +27,7 @@ public class UtenteDAO {
     public Utente login(String username, String password) {
         Utente utente = null;
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "SELECT * FROM UTENTI WHERE USERNAME=? AND PASSWORD=?";
+            String sql = "SELECT * FROM UTENTI WHERE USERNAME=? AND PASSWORD=? AND ATTIVO=TRUE";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, username);
             ps.setString(2, hashPassword(password));
@@ -41,6 +41,8 @@ public class UtenteDAO {
                 utente.setEmail(rs.getString("EMAIL"));
                 utente.setRuolo(rs.getString("RUOLO"));
                 utente.setDataRegistrazione(rs.getTimestamp("DATA_REGISTRAZIONE"));
+                utente.setUltimoAccesso(rs.getTimestamp("ULTIMO_ACCESSO"));
+                utente.setStato(rs.getBoolean("ATTIVO") ? "attivo" : "inattivo");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,7 +53,7 @@ public class UtenteDAO {
     // Metodo per inserire un nuovo utente con password hashata
     public boolean insert(Utente utente) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "INSERT INTO UTENTI (USERNAME, PASSWORD, EMAIL, RUOLO) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO UTENTI (USERNAME, PASSWORD, EMAIL, RUOLO, ATTIVO) VALUES (?, ?, ?, ?, TRUE)";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, utente.getUsername());
             ps.setString(2, hashPassword(utente.getPassword()));
@@ -80,6 +82,8 @@ public class UtenteDAO {
                 utente.setEmail(rs.getString("EMAIL"));
                 utente.setRuolo(rs.getString("RUOLO"));
                 utente.setDataRegistrazione(rs.getTimestamp("DATA_REGISTRAZIONE"));
+                utente.setUltimoAccesso(rs.getTimestamp("ULTIMO_ACCESSO"));
+                utente.setStato(rs.getBoolean("ATTIVO") ? "attivo" : "inattivo");
                 return utente;
             }
         } catch (Exception e) {
@@ -103,6 +107,8 @@ public class UtenteDAO {
                 utente.setEmail(rs.getString("EMAIL"));
                 utente.setRuolo(rs.getString("RUOLO"));
                 utente.setDataRegistrazione(rs.getTimestamp("DATA_REGISTRAZIONE"));
+                utente.setUltimoAccesso(rs.getTimestamp("ULTIMO_ACCESSO"));
+                utente.setStato(rs.getBoolean("ATTIVO") ? "attivo" : "inattivo");
                 return utente;
             }
         } catch (Exception e) {
@@ -126,6 +132,33 @@ public class UtenteDAO {
                 utente.setEmail(rs.getString("EMAIL"));
                 utente.setRuolo(rs.getString("RUOLO"));
                 utente.setDataRegistrazione(rs.getTimestamp("DATA_REGISTRAZIONE"));
+                utente.setUltimoAccesso(rs.getTimestamp("ULTIMO_ACCESSO"));
+                utente.setStato(rs.getBoolean("ATTIVO") ? "attivo" : "inattivo");
+                lista.add(utente);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+    // Trova solo utenti attivi
+    public List<Utente> findAttivi() {
+        List<Utente> lista = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT * FROM UTENTI WHERE ATTIVO=TRUE ORDER BY USERNAME";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Utente utente = new Utente();
+                utente.setId(rs.getInt("ID"));
+                utente.setUsername(rs.getString("USERNAME"));
+                utente.setPassword(rs.getString("PASSWORD"));
+                utente.setEmail(rs.getString("EMAIL"));
+                utente.setRuolo(rs.getString("RUOLO"));
+                utente.setDataRegistrazione(rs.getTimestamp("DATA_REGISTRAZIONE"));
+                utente.setUltimoAccesso(rs.getTimestamp("ULTIMO_ACCESSO"));
+                utente.setStato("attivo");
                 lista.add(utente);
             }
         } catch (Exception e) {
@@ -158,6 +191,48 @@ public class UtenteDAO {
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setString(1, hashPassword(newPassword));
             ps.setInt(2, userId);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Blocca un utente
+    public boolean bloccaUtente(int userId) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "UPDATE UTENTI SET ATTIVO=FALSE WHERE ID=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, userId);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Sblocca un utente
+    public boolean sbloccaUtente(int userId) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "UPDATE UTENTI SET ATTIVO=TRUE WHERE ID=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, userId);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Aggiorna ultimo accesso
+    public boolean updateUltimoAccesso(int userId) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "UPDATE UTENTI SET ULTIMO_ACCESSO=CURRENT_TIMESTAMP WHERE ID=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, userId);
             int rows = ps.executeUpdate();
             return rows > 0;
         } catch (Exception e) {
@@ -236,11 +311,71 @@ public class UtenteDAO {
                 utente.setEmail(rs.getString("EMAIL"));
                 utente.setRuolo(rs.getString("RUOLO"));
                 utente.setDataRegistrazione(rs.getTimestamp("DATA_REGISTRAZIONE"));
+                utente.setUltimoAccesso(rs.getTimestamp("ULTIMO_ACCESSO"));
+                utente.setStato(rs.getBoolean("ATTIVO") ? "attivo" : "inattivo");
                 lista.add(utente);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return lista;
+    }
+
+    // Conta utenti per stato
+    public int countByStato(String stato) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT COUNT(*) FROM UTENTI WHERE ATTIVO=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setBoolean(1, "attivo".equals(stato));
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // Ottieni statistiche utenti
+    public Map<String, Integer> getStatisticheUtenti() {
+        Map<String, Integer> stats = new HashMap<>();
+        try (Connection con = DBConnection.getConnection()) {
+            // Conta utenti attivi
+            String sql1 = "SELECT COUNT(*) FROM UTENTI WHERE ATTIVO=TRUE";
+            PreparedStatement ps1 = con.prepareStatement(sql1);
+            ResultSet rs1 = ps1.executeQuery();
+            if (rs1.next()) {
+                stats.put("attivi", rs1.getInt(1));
+            }
+
+            // Conta utenti inattivi
+            String sql2 = "SELECT COUNT(*) FROM UTENTI WHERE ATTIVO=FALSE";
+            PreparedStatement ps2 = con.prepareStatement(sql2);
+            ResultSet rs2 = ps2.executeQuery();
+            if (rs2.next()) {
+                stats.put("inattivi", rs2.getInt(1));
+            }
+
+            // Conta admin
+            String sql3 = "SELECT COUNT(*) FROM UTENTI WHERE RUOLO='admin'";
+            PreparedStatement ps3 = con.prepareStatement(sql3);
+            ResultSet rs3 = ps3.executeQuery();
+            if (rs3.next()) {
+                stats.put("admin", rs3.getInt(1));
+            }
+
+            // Conta utenti normali
+            String sql4 = "SELECT COUNT(*) FROM UTENTI WHERE RUOLO='utente'";
+            PreparedStatement ps4 = con.prepareStatement(sql4);
+            ResultSet rs4 = ps4.executeQuery();
+            if (rs4.next()) {
+                stats.put("utenti", rs4.getInt(1));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stats;
     }
 }
