@@ -35,3 +35,8 @@ Thumbs.db
 # Backup files
 *.bak
 *.orig 
+
+# Target directory files
+target/**/*.jsp
+target/**/*.xml
+target/**/*.properties 
