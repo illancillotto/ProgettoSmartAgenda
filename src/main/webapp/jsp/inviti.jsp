@@ -25,18 +25,18 @@
                         <!-- Header con nome utente e pulsanti -->
                         <div class="row bg-primary text-white py-3">
                             <div class="col text-center">
-                                <h4 class="mb-0"><i class="bi bi-envelope"></i> Inviti</h4>
+                                <h4 class="mb-0"><i class="fas fa-envelope"></i> Inviti</h4>
                             </div>
                             <div class="col-auto">
-                                <span class="me-3"><i class="bi bi-person"></i>
+                                <span class="me-3"><i class="fas fa-user"></i>
                                     <%= utente.getUsername() %>
                                 </span>
                                 <a href="<%= request.getContextPath() %>/home"
                                     class="btn btn-outline-light btn-sm me-2">
-                                    <i class="bi bi-house"></i> Home
+                                    <i class="fas fa-home"></i> Home
                                 </a>
                                 <a href="<%= request.getContextPath() %>/logout" class="btn btn-outline-light btn-sm">
-                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                    <i class="fas fa-sign-out-alt"></i> Logout
                                 </a>
                             </div>
                         </div>
@@ -73,24 +73,23 @@
                                                                 </div>
                                                                 <% } else { %>
                                                                     <% for (Invito invito : invitiRicevuti) { %>
-                                                                        <div class="card mb-3 border-<%= invito.getStato().equals("
-                                                                            accettato") ? "success" :
-                                                                            (invito.getStato().equals("rifiutato")? "danger"
-                                                                            : "warning" ) %>">
+                                                                        <div>Stato: <%= invito.getStato() %>
+                                                                        </div> <!-- DEBUG -->
+                                                                        <div class="card mb-3 border-<%= invito.getStato().equals("accettato") ? "success" :
+                                                                            (invito.getStato().equals("rifiutato")
+                                                                            ? "danger" : "warning" ) %>">
                                                                             <div class="card-body">
                                                                                 <h6 class="card-title">
                                                                                     <%= invito.getTitoloAppuntamento()
                                                                                         %>
                                                                                         <span
-                                                                                            class="badge bg-<%= invito.getStato().equals("
-                                                                                            accettato") ? "success" :
+                                                                                            class="badge bg-<%= invito.getStato().equals("accettato") ? "success" :
                                                                                             (invito.getStato().equals("rifiutato")
                                                                                             ? "danger" : "warning" )
                                                                                             %>">
                                                                                             <%= invito.getStato().toUpperCase()
                                                                                                 %>
                                                                                         </span>
-
                                                                                 </h6>
                                                                                 <p>
                                                                                     <strong>Da:</strong>
@@ -99,8 +98,7 @@
                                                                                         <strong>Data:</strong>
                                                                                         <%= invito.getDataAppuntamento()
                                                                                             !=null ? new
-                                                                                            java.text.SimpleDateFormat("dd/MM/yyyy
-                                                                                            HH:mm").format(invito.getDataAppuntamento())
+                                                                                            java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(invito.getDataAppuntamento())
                                                                                             : "N/A" %><br>
                                                                                             <% if
                                                                                                 (invito.getDescrizione()
@@ -121,9 +119,7 @@
                                                                                                                 %><br>
                                                                                                                 <% } %>
                                                                                 </p>
-                                                                                <% if
-                                                                                    (invito.getStato().equals("in_attesa"))
-                                                                                    { %>
+                                                                                <% if (invito.isPending()) { %>
                                                                                     <div class="btn-group" role="group">
                                                                                         <a href="<%= request.getContextPath() %>/inviti?action=accept&id=<%= invito.getId() %>"
                                                                                             class="btn btn-success btn-sm">
@@ -159,8 +155,7 @@
                                                                 </div>
                                                                 <% } else { %>
                                                                     <% for (Invito invito : invitiInviati) { %>
-                                                                        <div class="card mb-3 border-<%= invito.getStato().equals("
-                                                                            accettato") ? "success" :
+                                                                        <div class="card mb-3 border-<%= invito.getStato().equals("accettato") ? "success" :
                                                                             (invito.getStato().equals("rifiutato")
                                                                             ? "danger" : "warning" ) %>">
                                                                             <div class="card-body">
@@ -168,8 +163,7 @@
                                                                                     <%= invito.getTitoloAppuntamento()
                                                                                         %>
                                                                                         <span
-                                                                                            class="badge bg-<%= invito.getStato().equals("
-                                                                                            accettato") ? "success" :
+                                                                                            class="badge bg-<%= invito.getStato().equals("accettato") ? "success" :
                                                                                             (invito.getStato().equals("rifiutato")
                                                                                             ? "danger" : "warning" )
                                                                                             %>">
@@ -184,8 +178,7 @@
                                                                                         <strong>Data:</strong>
                                                                                         <%= invito.getDataAppuntamento()
                                                                                             !=null ? new
-                                                                                            java.text.SimpleDateFormat("dd/MM/yyyy
-                                                                                            HH:mm").format(invito.getDataAppuntamento())
+                                                                                            java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(invito.getDataAppuntamento())
                                                                                             : "N/A" %><br>
                                                                                             <% if
                                                                                                 (invito.getDescrizione()
@@ -207,7 +200,7 @@
                                                                                                                 <% } %>
                                                                                 </p>
                                                                                 <% if
-                                                                                    (invito.getStato().equals("in_attesa"))
+                                                                                    ("in_attesa".equals(invito.getStato()))
                                                                                     { %>
                                                                                     <a href="<%= request.getContextPath() %>/inviti?action=cancel&id=<%= invito.getId() %>"
                                                                                         class="btn btn-outline-danger btn-sm"
@@ -304,6 +297,7 @@
 
                                         <script
                                             src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+                    </div>
                 </body>
 
                 </html>

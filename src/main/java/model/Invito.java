@@ -7,7 +7,7 @@ public class Invito {
     private int idAppuntamento;
     private int idUtenteInvitante;
     private int idUtenteInvitato;
-    private String stato; // pending, accepted, declined
+    private String stato; // Valori possibili: "in_attesa", "accettato", "rifiutato"
     private Date dataInvito;
     private Date dataRisposta;
     private String messaggio;
@@ -147,7 +147,10 @@ public class Invito {
 
     // Metodi di utilità
     public boolean isPending() {
-        return "in_attesa".equals(stato);
+        return stato != null && (
+            "in_attesa".equalsIgnoreCase(stato.trim())
+            || "pending".equalsIgnoreCase(stato.trim())
+        );
     }
 
     public boolean isAccepted() {
