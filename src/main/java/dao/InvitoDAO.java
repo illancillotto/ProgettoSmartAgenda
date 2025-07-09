@@ -9,12 +9,13 @@ public class InvitoDAO {
     // Inserisce un nuovo invito
     public boolean insert(Invito invito) {
         try (Connection con = DBConnection.getConnection()) {
-            String sql = "INSERT INTO INVITI (ID_APPUNTAMENTO, ID_UTENTE_INVITANTE, ID_UTENTE_INVITATO, MESSAGGIO) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO INVITI (ID_APPUNTAMENTO, ID_UTENTE_INVITANTE, ID_UTENTE_INVITATO, MESSAGGIO, STATO) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, invito.getIdAppuntamento());
             ps.setInt(2, invito.getIdUtenteInvitante());
             ps.setInt(3, invito.getIdUtenteInvitato());
             ps.setString(4, invito.getMessaggio());
+            ps.setString(5, invito.getStato());
             int rows = ps.executeUpdate();
             return rows > 0;
         } catch (Exception e) {
