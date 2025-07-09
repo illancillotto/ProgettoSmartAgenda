@@ -3,6 +3,7 @@ package dao;
 import model.Appuntamento;
 import java.sql.*;
 import java.util.*;
+import java.sql.Types;
 
 public class AppuntamentoDAO {
 
@@ -36,23 +37,31 @@ public class AppuntamentoDAO {
         return lista;
     }
 
-    // Inserisci un nuovo appuntamento
-    public boolean insert(Appuntamento app) {
+    // Inserisce un nuovo appuntamento
+    public boolean insert(Appuntamento appuntamento) {
         try (Connection con = DBConnection.getConnection()) {
             String sql = "INSERT INTO APPUNTAMENTI (TITOLO, DESCRIZIONE, DATA, ID_UTENTE, CONDIVISO, ID_CATEGORIA) VALUES (?, ?, ?, ?, ?, ?)";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, app.getTitolo());
-            ps.setString(2, app.getDescrizione());
-            ps.setTimestamp(3, new Timestamp(app.getDataOra().getTime()));
-            ps.setInt(4, app.getIdUtente());
-            ps.setBoolean(5, app.isCondiviso());
-            if (app.getIdCategoria() > 0) {
-                ps.setInt(6, app.getIdCategoria());
+            PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, appuntamento.getTitolo());
+            ps.setString(2, appuntamento.getDescrizione());
+            ps.setTimestamp(3, new Timestamp(appuntamento.getDataOra().getTime()));
+            ps.setInt(4, appuntamento.getIdUtente());
+            ps.setBoolean(5, appuntamento.isCondiviso());
+            if (appuntamento.getIdCategoria() > 0) {
+                ps.setInt(6, appuntamento.getIdCategoria());
             } else {
-                ps.setNull(6, java.sql.Types.INTEGER);
+                ps.setNull(6, Types.INTEGER);
             }
             int rows = ps.executeUpdate();
-            return rows > 0;
+
+            if (rows > 0) {
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    appuntamento.setId(rs.getInt(1));
+                    return true;
+                }
+            }
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -418,4 +427,20 @@ public class AppuntamentoDAO {
             return false;
         }
     }
+
+    // Trova l'ID dell'ultimo appuntamento inserito per l'utente
+    public int findLastInsertedId() {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT LAST_INSERT_ID() as last_id";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("last_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
 }

@@ -1,6 +1,9 @@
 package controller;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -117,77 +120,91 @@ public class InvitoServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            String appuntamentoIdStr = request.getParameter("appuntamentoId");
-            String usernameInvitato = request.getParameter("usernameInvitato");
+            // Get form parameters
+            String usernameInvitato = request.getParameter("username");
+            String titolo = request.getParameter("titolo");
+            String dataStr = request.getParameter("data");
+            String oraStr = request.getParameter("ora");
+            String descrizione = request.getParameter("descrizione");
             String messaggio = request.getParameter("messaggio");
 
-            if (appuntamentoIdStr == null || usernameInvitato == null ||
-                    appuntamentoIdStr.trim().isEmpty() || usernameInvitato.trim().isEmpty()) {
-                request.setAttribute("errore", "Dati incompleti per l'invito");
-                response.sendRedirect("agenda?action=list");
+            if (usernameInvitato == null || titolo == null || dataStr == null ||
+                    usernameInvitato.trim().isEmpty() || titolo.trim().isEmpty() || dataStr.trim().isEmpty()) {
+                request.getSession().setAttribute("errore", "Dati incompleti per l'invito");
+                response.sendRedirect(request.getContextPath() + "/inviti");
                 return;
             }
 
-            int appuntamentoId = Integer.parseInt(appuntamentoIdStr);
-
-            // Verifica che l'appuntamento appartenga all'utente
-            AppuntamentoDAO appDAO = new AppuntamentoDAO();
-            Appuntamento appuntamento = appDAO.findById(appuntamentoId);
-
-            if (appuntamento == null || appuntamento.getIdUtente() != utente.getId()) {
-                request.setAttribute("errore", "Appuntamento non trovato o non autorizzato");
-                response.sendRedirect("agenda?action=list");
-                return;
-            }
-
-            // Verifica che l'utente invitato esista
+            // Verify invited user exists
             UtenteDAO userDAO = new UtenteDAO();
             Utente utenteInvitato = userDAO.findByUsername(usernameInvitato.trim());
 
             if (utenteInvitato == null) {
-                request.setAttribute("errore", "Utente da invitare non trovato");
-                response.sendRedirect("agenda?action=list");
+                request.getSession().setAttribute("errore", "Utente da invitare non trovato");
+                response.sendRedirect(request.getContextPath() + "/inviti");
                 return;
             }
 
             if (utenteInvitato.getId() == utente.getId()) {
-                request.setAttribute("errore", "Non puoi invitare te stesso");
-                response.sendRedirect("agenda?action=list");
+                request.getSession().setAttribute("errore", "Non puoi invitare te stesso");
+                response.sendRedirect(request.getContextPath() + "/inviti");
                 return;
             }
 
-            // Verifica che non esista già un invito
-            InvitoDAO invDAO = new InvitoDAO();
-            if (invDAO.existsInvito(appuntamentoId, utenteInvitato.getId())) {
-                request.setAttribute("errore", "Invito già inviato a questo utente");
-                response.sendRedirect("agenda?action=list");
+            // Create appointment
+            Appuntamento appuntamento = new Appuntamento();
+            appuntamento.setTitolo(titolo.trim());
+            appuntamento.setDescrizione(descrizione != null ? descrizione.trim() : "");
+
+            // Parse date and time
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                String dataOraStr = dataStr + " " + (oraStr != null && !oraStr.trim().isEmpty() ? oraStr : "00:00");
+                Date dataOra = sdf.parse(dataOraStr);
+                appuntamento.setDataOra(dataOra);
+            } catch (ParseException e) {
+                request.getSession().setAttribute("errore", "Formato data/ora non valido");
+                response.sendRedirect(request.getContextPath() + "/inviti");
                 return;
             }
 
-            // Crea l'invito
-            Invito invito = new Invito(appuntamentoId, utente.getId(), utenteInvitato.getId(),
+            appuntamento.setIdUtente(utente.getId());
+            appuntamento.setCondiviso(true); // Always true for invites
+
+            // Save appointment
+            AppuntamentoDAO appDAO = new AppuntamentoDAO();
+            boolean appointmentSuccess = appDAO.insert(appuntamento);
+
+            if (!appointmentSuccess) {
+                request.getSession().setAttribute("errore", "Errore nella creazione dell'appuntamento");
+                response.sendRedirect(request.getContextPath() + "/inviti");
+                return;
+            }
+
+            // Create invite using the ID set in the appointment object
+            Invito invito = new Invito(appuntamento.getId(), utente.getId(), utenteInvitato.getId(),
                     messaggio != null ? messaggio.trim() : "");
 
-            boolean success = invDAO.insert(invito);
+            InvitoDAO invDAO = new InvitoDAO();
+            boolean inviteSuccess = invDAO.insert(invito);
 
-            if (success) {
-                // Crea notifica per l'utente invitato
+            if (inviteSuccess) {
+                // Create notification for invited user
                 NotificaDAO notDAO = new NotificaDAO();
-                notDAO.createInvito(utenteInvitato.getId(), utente.getUsername(), appuntamento.getTitolo());
-
-                request.setAttribute("successo", "Invito inviato con successo!");
+                notDAO.createInvito(utenteInvitato.getId(), utente.getUsername(), titolo);
+                request.getSession().setAttribute("successo", "Invito inviato con successo!");
             } else {
-                request.setAttribute("errore", "Errore nell'invio dell'invito");
+                // If invite fails, delete the appointment
+                appDAO.delete(appuntamento.getId());
+                request.getSession().setAttribute("errore", "Errore nell'invio dell'invito");
             }
 
-        } catch (NumberFormatException e) {
-            request.setAttribute("errore", "ID appuntamento non valido");
         } catch (Exception e) {
-            request.setAttribute("errore", "Errore interno: " + e.getMessage());
+            request.getSession().setAttribute("errore", "Errore interno: " + e.getMessage());
             e.printStackTrace();
         }
 
-        response.sendRedirect("agenda?action=list");
+        response.sendRedirect(request.getContextPath() + "/inviti");
     }
 
     private void accettaInvito(HttpServletRequest request, HttpServletResponse response, Utente utente)
