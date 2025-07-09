@@ -9,8 +9,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: SMARTAGENDA
-      MYSQL_USER: alessandro
-      MYSQL_PASSWORD: studenteEcampus2025
     ports:
       - "3307:3306"
     volumes:

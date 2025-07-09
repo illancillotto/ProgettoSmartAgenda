@@ -32,6 +32,7 @@ public class UtenteDAO {
             ps.setString(1, username);
             ps.setString(2, hashPassword(password));
             ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
                 utente = new Utente();
                 utente.setId(rs.getInt("ID"));

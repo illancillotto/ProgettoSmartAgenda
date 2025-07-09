@@ -16,12 +16,14 @@ RUN rm -rf $CATALINA_HOME/webapps/*
 # Copia il file WAR dell'applicazione
 COPY target/SmartAgenda.war $CATALINA_HOME/webapps/ROOT.war
 
-# Estrai il WAR per poter sovrascrivere i file di configurazione
+# Estrai il WAR per poter modificare la configurazione
 RUN cd $CATALINA_HOME/webapps && unzip -q ROOT.war -d ROOT && rm ROOT.war
+
+# Modifica la configurazione del database per Docker (sostituisce localhost con mysql)
+RUN sed -i 's/localhost/mysql/g' $CATALINA_HOME/webapps/ROOT/WEB-INF/db.properties
 
 # Copia la configurazione del database specifica per Docker
 COPY docker/context.xml $CATALINA_HOME/conf/context.xml
-COPY docker/db.properties $CATALINA_HOME/webapps/ROOT/WEB-INF/db.properties
 
 # Crea directory per i log
 RUN mkdir -p /var/log/smartagenda

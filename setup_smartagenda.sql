@@ -1,11 +1,15 @@
 -- Crea database se non esiste
 CREATE DATABASE IF NOT EXISTS SMARTAGENDA DEFAULT CHARACTER SET UTF8MB4 COLLATE UTF8MB4_UNICODE_CI;
 
--- Crea utente solo se non esiste
+-- Crea utente solo se non esiste (per localhost e per Docker)
 CREATE USER IF NOT EXISTS 'alessandro'@'localhost' IDENTIFIED BY 'studenteEcampus2025';
+
+CREATE USER IF NOT EXISTS 'alessandro'@'%' IDENTIFIED BY 'studenteEcampus2025';
 
 -- Permessi solo sul database smartagenda
 GRANT ALL PRIVILEGES ON SMARTAGENDA.* TO 'alessandro'@'localhost';
+
+GRANT ALL PRIVILEGES ON SMARTAGENDA.* TO 'alessandro'@'%';
 
 FLUSH PRIVILEGES;
 
