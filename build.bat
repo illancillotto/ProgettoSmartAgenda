@@ -67,6 +67,31 @@ del sources.txt
 echo.
 echo 📦 Creazione file WAR...
 
+REM Controlla se il comando jar è disponibile
+jar --version >nul 2>&1
+if errorlevel 1 (
+    echo ❌ ERRORE: Comando 'jar' non trovato!
+    echo.
+    echo 🔧 SOLUZIONE: Devi aggiungere il JDK al PATH di sistema
+    echo.
+    echo 📋 PASSI DA SEGUIRE:
+    echo    1. Trova la cartella del JDK (es: C:\Program Files\Java\jdk-24\bin)
+    echo    2. Apri "Variabili d'ambiente" dal menu Start
+    echo    3. In "Variabili di sistema" trova "Path" e clicca "Modifica"
+    echo    4. Clicca "Nuovo" e aggiungi il percorso del JDK\bin
+    echo    5. Salva e riavvia il terminale
+    echo.
+    echo 💡 ALTERNATIVA: Se non hai il JDK, scaricalo da:
+    echo    https://www.oracle.com/it/java/technologies/downloads/#jdk24-windows
+    echo.
+    echo ⚠ Dopo aver risolto, riavvia questo script.
+    echo.
+    pause
+    exit /b 1
+)
+
+echo ✓ Comando jar trovato
+
 REM Crea il file WAR
 cd target
 jar -cvf SmartAgenda.war *
@@ -79,6 +104,12 @@ if exist "target\SmartAgenda.war" (
     for %%A in (target\SmartAgenda.war) do echo    Dimensione: %%~zA bytes
 ) else (
     echo ❌ Errore nella creazione del file WAR
+    echo.
+    echo 🔍 Possibili cause:
+    echo    - Permessi insufficienti nella cartella target
+    echo    - Spazio su disco insufficiente
+    echo    - Problemi con il comando jar
+    echo.
     pause
     exit /b 1
 )

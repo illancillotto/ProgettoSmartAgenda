@@ -7,9 +7,7 @@ build/
 # Log files
 *.log
 
-# JAR/WAR files
-*.jar
-*.war
+# JAR/WAR files 
 
 # IDE files
 .project
@@ -40,3 +38,4 @@ Thumbs.db
 target/**/*.jsp
 target/**/*.xml
 target/**/*.properties 
+target/**/*.jar
