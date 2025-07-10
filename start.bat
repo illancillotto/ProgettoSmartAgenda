@@ -48,15 +48,15 @@ if /i "%cleanup%"=="s" (
 
 REM Build del progetto
 echo ℹ Build del progetto Java...
-if exist "build.bat" (
-    call build.bat
+if exist "build_simple.bat" (
+    call build_simple.bat
     if errorlevel 1 (
         echo ERRORE: Errore durante il build del progetto
         pause
         exit /b 1
     )
 ) else (
-    echo ERRORE: Script build.bat non trovato!
+    echo ERRORE: Script build_simple.bat non trovato!
     pause
     exit /b 1
 )

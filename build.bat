@@ -67,10 +67,37 @@ del sources.txt
 echo.
 echo 📦 Creazione file WAR...
 
-REM Controlla se il comando jar è disponibile
-jar --version >nul 2>&1
+REM Forza la ricerca del JDK nelle posizioni standard
+echo 🔍 Cercando JDK nelle posizioni standard...
+
+REM Cerca JDK nelle posizioni standard
+echo Controllando C:\Program Files\Java\jdk-24\bin\jar.exe...
+if exist "C:\Program Files\Java\jdk-24\bin\jar.exe" (
+    set "JAR_PATH=C:\Program Files\Java\jdk-24\bin\jar.exe"
+    echo ✓ JDK 24 trovato in C:\Program Files\Java\jdk-24\bin\
+    goto :found_jar
+)
+echo Controllando C:\Program Files\Java\jdk-17\bin\jar.exe...
+if exist "C:\Program Files\Java\jdk-17\bin\jar.exe" (
+    set "JAR_PATH=C:\Program Files\Java\jdk-17\bin\jar.exe"
+    echo ✓ JDK 17 trovato in C:\Program Files\Java\jdk-17\bin\
+    goto :found_jar
+)
+echo Controllando C:\Program Files\Java\jdk-21\bin\jar.exe...
+if exist "C:\Program Files\Java\jdk-21\bin\jar.exe" (
+    set "JAR_PATH=C:\Program Files\Java\jdk-21\bin\jar.exe"
+    echo ✓ JDK 21 trovato in C:\Program Files\Java\jdk-21\bin\
+    goto :found_jar
+)
+
+REM Se non trova nessun JDK, controlla il PATH
+where jar >nul 2>&1
 if errorlevel 1 (
-    echo ❌ ERRORE: Comando 'jar' non trovato!
+    echo ❌ ERRORE: Comando 'jar' non trovato nel PATH!
+    echo.
+    echo ❌ JDK non trovato nelle posizioni standard
+    
+    echo ❌ JDK non trovato nelle posizioni standard
     echo.
     echo 🔧 SOLUZIONE: Devi aggiungere il JDK al PATH di sistema
     echo.
@@ -90,11 +117,22 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo ✓ Comando jar trovato
+:found_jar
+
+if defined JAR_PATH (
+    echo ✓ Comando jar trovato: %JAR_PATH%
+) else (
+    echo ✓ Comando jar trovato nel PATH
+)
 
 REM Crea il file WAR
 cd target
-jar -cvf SmartAgenda.war *
+if defined JAR_PATH (
+    echo ✓ Usando jar da: %JAR_PATH%
+    "%JAR_PATH%" -cvf SmartAgenda.war *
+) else (
+    jar -cvf SmartAgenda.war *
+)
 cd ..
 
 if exist "target\SmartAgenda.war" (

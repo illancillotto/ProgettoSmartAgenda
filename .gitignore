@@ -39,3 +39,4 @@ target/**/*.jsp
 target/**/*.xml
 target/**/*.properties 
 target/**/*.jar
+target/**/*.war
