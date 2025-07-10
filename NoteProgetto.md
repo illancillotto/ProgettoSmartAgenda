@@ -1,8 +1,8 @@
 Nota sull’avvio del progetto e sulla configurazione
 Il progetto SmartAgenda è stato dockerizzato per rendere l’avvio e il deploy più rapidi e semplici.
-Grazie a Docker e al file docker-compose.yml, è possibile avviare automaticamente sia il backend Java (Tomcat) sia il database MySQL già configurato per l’applicazione.
+Grazie a Docker e al file docker-compose.yml, è possibile avviare automaticamente sia il backend Java (Tomcat) sia il database MySQL già configurato per l’applicazione. 
 
-Avvio rapido con Docker
+Avvio rapido con Docker - TESTATO SU LINUX
 Clonare la repository:
 git clone https://github.com/illancillotto/ProgettoSmartAgenda.git
 
